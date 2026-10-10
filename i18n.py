@@ -107,8 +107,8 @@ PT_BR = {
     "cancelling": "Cancelando conversão...",
     "cancelled_one": "Cancelado. {completed} arquivo concluído.",
     "cancelled_many": "Cancelado. {completed} arquivos concluídos.",
-    "partial": "Conversão finalizada. Sucessos: {completed}. Falhas: {failed}."
-    "more_errors": "... e mais {count} outras ocorrências."
+    "partial": "Conversão finalizada. Sucessos: {completed}. Falhas: {failed}.",
+    "more_errors": "... e mais {count} outras ocorrências.",
     "complete_one": "Concluído: {completed} arquivo convertido.",
     "complete_many": "Concluído: {completed} arquivos convertidos.",
     "missing_selection_title": "Nenhum vídeo selecionado",
