@@ -13,6 +13,8 @@ A desktop video-to-audio converter for Windows, based on [NSTechBytes/Video-to-A
 - Keep the interface responsive with a background worker.
 - Launch from the Windows Start menu using pythonw.exe without opening a terminal.
 - Use a private Python virtual environment; no changes to system Python or WhisperX.
+- Choose English or **Português (Brasil)**, or follow the Windows language automatically. The language preference is saved.
+- Clear the input list automatically after a fully successful conversion; keep it on errors or cancellation.
 
 ## Windows / PowerShell installation
 
@@ -69,6 +71,10 @@ You can now search for **Video-to-Audio** from Start and pin it. If you have alr
 5. Choose MP3, WAV or AAC, and bitrate (64–320 kbps) for MP3/AAC, then press **Convert**.
 6. Follow real conversion and batch progress. Press **Cancel** to stop.
 7. Existing output files are never intentionally replaced; a numbered filename is chosen when necessary.
+
+After all files convert successfully, select **OK** on the completion dialog: the input list and any manually selected output folder are cleared for the next batch. The progress bar and completion message stay visible as confirmation. If a batch fails or is cancelled, the list remains available to retry.
+
+The **Language / Idioma** selector at the top-right has three options: Automatic (Windows), Português (Brasil) and English. Automatic follows the Windows UI locale (Portuguese locales use pt-BR; other languages use English). A manually chosen language persists for future launches. The Windows installer also offers English and Brazilian Portuguese; the Apache-2.0 license remains in its official English text.
 
 WAV uses uncompressed 16-bit PCM and ignores the bitrate option. A raw AAC output is an ADTS audio file. An input without an audio stream is reported as a failed file, and remaining files continue processing. If a media file does not report its duration, per-file progress may stay at its starting value until conversion completes.
 
