@@ -109,7 +109,7 @@ class VideoToAudioApp(QMainWindow):
         self.settings = QSettings("Video-to-Audio", "Video-to-Audio")
         self.language_choice = str(self.settings.value("ui/language", "en"))
         if self.language_choice not in SUPPORTED_CHOICES:
-            self.language_choice = "auto"
+            self.language_choice = "en"
         self.language = effective_language(self.language_choice)
         self._status_key = "ready"
         self._status_values = {}
