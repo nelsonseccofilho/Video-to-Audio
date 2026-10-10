@@ -271,3 +271,31 @@ class GuiTests(unittest.TestCase):
             else:
                 settings.setValue("ui/language", previous)
             window.close()
+
+    def test_reopening_app_keeps_explicit_language_choice(self):
+        first = APP["VideoToAudioApp"]()
+        settings = first.settings
+        previous = settings.value("ui/language", None)
+        try:
+            first.language_combo.setCurrentIndex(
+                first.language_combo.findData("pt_BR")
+            )
+            self.assertEqual(settings.value("ui/language"), "pt_BR")
+            first.close()
+
+            reopened = APP["VideoToAudioApp"]()
+            try:
+                self.assertEqual(reopened.language_combo.currentData(), "pt_BR")
+                self.assertEqual(reopened.convert_btn.text(), "Converter")
+                reopened.language_combo.setCurrentIndex(
+                    reopened.language_combo.findData("en")
+                )
+                self.assertEqual(reopened.convert_btn.text(), "Convert")
+            finally:
+                reopened.close()
+        finally:
+            if previous is None:
+                settings.remove("ui/language")
+            else:
+                settings.setValue("ui/language", previous)
+            first.close()
