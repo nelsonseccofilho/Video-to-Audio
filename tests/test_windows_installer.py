@@ -21,12 +21,12 @@ SPEC.loader.exec_module(windows_build)
 
 class PackagingTests(unittest.TestCase):
     def test_version_matches_inno_and_expected_output(self):
-        self.assertEqual(windows_build.VERSION, "0.2.0")
+        self.assertEqual(windows_build.VERSION, "0.3.0")
         self.assertEqual(windows_build.APP_NAME, "Video-to-Audio")
         installer = (ROOT / "installer" / "Video-to-Audio.iss").read_text(
             encoding="utf-8"
         )
-        self.assertIn('#define MyAppVersion "0.2.0"', installer)
+        self.assertIn('#define MyAppVersion "0.3.0"', installer)
         self.assertIn("PrivilegesRequired=lowest", installer)
         self.assertIn("DefaultDirName={localappdata}", installer)
         self.assertIn("UninstallDisplayIcon=", installer)
@@ -80,3 +80,22 @@ class PackagingTests(unittest.TestCase):
             builder.index("    check_source_syntax(Path(sys.executable))"),
             builder.index("    python = ensure_build_environment()"),
         )
+
+    def test_english_first_and_translated_license_by_installer_language(self):
+        setup = (ROOT / "installer" / "Video-to-Audio.iss").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("LanguageDetectionMethod=none", setup)
+        english = 'Name: "en"; MessagesFile: "compiler:Default.isl";'
+        portuguese = 'Name: "ptbr"; MessagesFile: "compiler:Languages\\BrazilianPortuguese.isl";'
+        self.assertLess(setup.index(english), setup.index(portuguese))
+        self.assertIn('LicenseFile: "..\\LICENSE"', setup)
+        self.assertIn('LicenseFile: "..\\installer\\LICENSE.pt-BR.txt"', setup)
+
+        original = (ROOT / "LICENSE").read_text(encoding="utf-8").strip()
+        localized = (ROOT / "installer" / "LICENSE.pt-BR.txt").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("RESUMO INFORMATIVO", localized)
+        self.assertIn("não substitui o texto", localized)
+        self.assertTrue(localized.rstrip().endswith(original))
