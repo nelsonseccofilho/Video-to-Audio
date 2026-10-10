@@ -65,6 +65,9 @@ Name: "desktopicon"; Description: "{cm:DesktopShortcut}"; GroupDescription: "{cm
 [Files]
 Source: "..\dist\Video-to-Audio\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\LICENSE"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\LICENSES\GPL-3.0-only.txt"; DestDir: "{app}\licenses"; Flags: ignoreversion
+Source: "..\LICENSES\BSD-2-Clause-imageio-ffmpeg.txt"; DestDir: "{app}\licenses"; Flags: ignoreversion
+Source: "..\docs\OPEN_SOURCE_DISTRIBUTION_POLICY.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\installer\LICENSE.pt-BR.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\docs\THIRD_PARTY_NOTICES.md"; DestDir: "{app}"; DestName: "THIRD_PARTY_NOTICES.md"; Flags: ignoreversion
 
