@@ -9,6 +9,7 @@ import importlib.util
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "build" / "windows" / "build.py"
@@ -31,11 +32,24 @@ class PackagingTests(unittest.TestCase):
         self.assertIn("UninstallDisplayIcon=", installer)
 
     def test_pyinstaller_instructions_bundle_icons_and_ffmpeg(self):
-        builder = SCRIPT.read_text(encoding="utf-8")
-        self.assertIn('"--collect-all", "imageio_ffmpeg"', builder)
-        self.assertIn('"--add-data", "icons:icons"', builder)
-        self.assertIn('"--onedir", "--windowed"', builder)
-        self.assertIn('".venv-build"', builder)
+        command = list(map(str, windows_build.pyinstaller_command(Path("python.exe"))))
+        self.assertEqual(command[command.index("--add-data") + 1],
+                         f"{(ROOT / 'icons').resolve()}:icons")
+        self.assertEqual(command[command.index("--icon") + 1],
+                         str((ROOT / "icons" / "icon.ico").resolve()))
+        self.assertIn("--onedir", command)
+        self.assertIn("--windowed", command)
+        self.assertEqual(command[command.index("--collect-all") + 1],
+                         "imageio_ffmpeg")
+        self.assertEqual(command[command.index("--specpath") + 1],
+                         str(ROOT / "build" / "pyinstaller"))
+        self.assertIn('".venv-build"', SCRIPT.read_text(encoding="utf-8"))
+
+    def test_missing_icons_fail_before_pyinstaller_runs(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with mock.patch.object(windows_build, "PROJECT", Path(directory)):
+                with self.assertRaisesRegex(RuntimeError, "icons were not found"):
+                    windows_build.pyinstaller_command(Path("python.exe"))
 
     def test_iscc_lookup_accepts_explicit_path(self):
         with tempfile.TemporaryDirectory() as directory:
