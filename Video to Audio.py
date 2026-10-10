@@ -293,6 +293,7 @@ class VideoToAudioApp(QMainWindow):
         else:
             self.bitrate_combo.setEnabled(False)
         self.cancel_btn.setEnabled(busy)
+        self.original_btn.setEnabled(not busy and self.output_dir is not None)
 
     def start_conversion(self):
         if self.worker is not None:
