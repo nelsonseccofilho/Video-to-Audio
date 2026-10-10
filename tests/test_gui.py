@@ -204,3 +204,70 @@ class GuiTests(unittest.TestCase):
             else:
                 settings.setValue("ui/language", previous)
             window.close()
+
+    def test_language_combo_changes_all_visible_text_both_directions(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "meeting.mkv"
+            source.write_bytes(b"test")
+            window = APP["VideoToAudioApp"]()
+            settings = window.settings
+            previous = settings.value("ui/language", None)
+            try:
+                window.language_combo.setCurrentIndex(
+                    window.language_combo.findData("en")
+                )
+                self.assertEqual(window.language_combo.itemData(0), "en")
+                self.assertEqual(window.language_combo.itemData(1), "pt_BR")
+                self.assertEqual(window.language, "en")
+                window.add_files([str(source)])
+                window._set_status("progress", name="meeting.mkv", current=20, overall=20)
+                self.assertEqual(window.select_btn.text(), "Select Videos")
+                self.assertIn("Save audio to:", window.output_label.text())
+                self.assertIn("(batch: 20%)", window.progress_label.text())
+
+                window.language_combo.setCurrentIndex(
+                    window.language_combo.findData("pt_BR")
+                )
+                self.assertEqual(window.language, "pt_BR")
+                self.assertEqual(window.select_btn.text(), "Selecionar vídeos")
+                self.assertEqual(window.original_btn.text(), "Usar pastas de origem")
+                self.assertIn("Salvar áudio em:", window.output_label.text())
+                self.assertIn("Origem:", window.video_list.item(0).toolTip())
+                self.assertIn("(lote: 20%)", window.progress_label.text())
+                self.assertIn("Vídeo", window.windowTitle())
+
+                window.language_combo.setCurrentIndex(
+                    window.language_combo.findData("en")
+                )
+                self.assertEqual(window.language, "en")
+                self.assertEqual(window.clear_btn.text(), "Clear List")
+                self.assertEqual(window.convert_btn.text(), "Convert")
+                self.assertIn("Save audio to:", window.output_label.text())
+                self.assertIn("Source:", window.video_list.item(0).toolTip())
+                self.assertIn("(batch: 20%)", window.progress_label.text())
+            finally:
+                if previous is None:
+                    settings.remove("ui/language")
+                else:
+                    settings.setValue("ui/language", previous)
+                window.close()
+
+    def test_legacy_auto_setting_migrates_to_english_default(self):
+        window = APP["VideoToAudioApp"]()
+        settings = window.settings
+        previous = settings.value("ui/language", None)
+        try:
+            settings.setValue("ui/language", "auto")
+            other = APP["VideoToAudioApp"]()
+            try:
+                self.assertEqual(other.language_choice, "en")
+                self.assertEqual(other.language_combo.currentData(), "en")
+                self.assertEqual(other.convert_btn.text(), "Convert")
+            finally:
+                other.close()
+        finally:
+            if previous is None:
+                settings.remove("ui/language")
+            else:
+                settings.setValue("ui/language", previous)
+            window.close()
