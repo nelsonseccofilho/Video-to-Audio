@@ -49,6 +49,20 @@ If it is installed in a nonstandard location:
 
 Do not commit dist, the generated build/pyinstaller directory, .venv-build or converted audio files. Source-controlled build/windows scripts must remain tracked.
 
+### Local QA and binary/license evidence without GitHub Actions
+
+The project owner reports that GitHub-hosted Actions are unavailable owing to an account billing balance. This does **not** mean that failing remote jobs prove a software test failure. For this free/open-source project, document a **local Windows QA** run instead, with exact revision, test results and binary hashes.
+
+After building, from the repository root, review the source-controlled script and run it in PowerShell 7:
+
+~~~powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File .\scripts\audit_windows_distribution.ps1
+~~~
+
+The bypass applies only to that new PowerShell process; it does not change your saved execution policy. The script does not modify your WhisperX environment. It collects the exact bundled-file SHA256 hashes, dependency versions, FFmpeg configure/license text, the installer SHA256 and local unit-test outputs under ignored **dist/audit/**. Review these outputs and remove private path details before sharing them.
+
+The complete source/license strategy is in [Open-source distribution policy](OPEN_SOURCE_DISTRIBUTION_POLICY.md). The installer now **contains** GPLv3, the upstream Apache-2.0 text and the BSD wrapper notice; however, those texts alone do not establish compliance for PyQt5, Qt and the exact FFmpeg binary. The current setup wizard still displays an Apache-oriented license page and needs adjustment and QA before any GPLv3 public binary release.
+
 ## Installer behavior
 
 The application UI and setup wizard are independently selectable. Choosing Portuguese for the setup wizard does not implicitly override the application default (English); the user can switch languages within the installed GUI and the selection persists. The operating system's native file picker may retain the Windows language by design. The Apache 2.0 source document remains in English, while the Portuguese license screen displays a full independent informational translation, followed by the complete authoritative original. Do not distribute the installer publicly until this translation and all third-party licenses are reviewed. See https://www.apache.org/foundation/license-faq.html for the ASF's guidance on translations.
@@ -66,7 +80,7 @@ Design rationale and official references: [Installer language and license UX](IN
 
 First validate the existing app GUI on PR #1, then on a Windows test system:
 
-- [ ] Build passes tests and creates both files above (35 tests expected with English-first bilingual language switching, per-language license notice and syntax preflight).
+- [ ] Build passes tests and creates both files above (36 tests expected with English-first bilingual language switching, per-language license notice and syntax preflight).
 - [ ] The standalone EXE starts by double-click, without a terminal window.
 - [ ] Convert one MKV to MP3 without picking a folder and play the audio.
 - [ ] After confirming a fully successful conversion, the input list is cleared and the final completion status remains visible.
@@ -84,7 +98,9 @@ First validate the existing app GUI on PR #1, then on a Windows test system:
 - [ ] Convert a short video using the installed app and listen to MP3.
 - [ ] Uninstall and confirm application files disappear but source videos/output audio remain.
 - [ ] Upgrade the installed 0.3.0 preview to 0.3.1 without duplicate product entries (AppId unchanged).
-- [ ] Resolve third-party binary redistribution requirements (THIRD_PARTY_NOTICES.md).
+- [ ] Resolve third-party binary redistribution requirements (THIRD_PARTY_NOTICES.md) and finish the GPLv3 binary source/notice strategy.
+- [ ] Review and revise setup wizard legal-language presentation to reflect the combined GPLv3 distribution correctly.
+- [ ] Run the local audit script and review its package/FFmpeg/Qt inventory, hashes and test logs; include appropriate evidence with release notes.
 - [ ] Review Windows SmartScreen: the preview installer is not code-signed.
 
 Do **not** publish a GitHub Release or tag 1.0.0 before this list is complete.
