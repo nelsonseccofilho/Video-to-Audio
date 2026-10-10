@@ -1,0 +1,3 @@
+# Install into a dedicated virtual environment; no changes to WhisperX.
+PyQt5>=5.15,<6
+imageio-ffmpeg>=0.6,<0.7
