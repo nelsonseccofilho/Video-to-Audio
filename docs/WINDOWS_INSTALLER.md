@@ -60,6 +60,8 @@ The application UI and setup wizard are independently selectable. Choosing Portu
 - No Python or FFmpeg prerequisite on recipient computers.
 - Uninstall does not delete videos or converted audio in other folders.
 
+Design rationale and official references: [Installer language and license UX](INSTALLER_LANGUAGE_UX.md).
+
 ## Acceptance checklist — REQUIRED before publishing
 
 First validate the existing app GUI on PR #1, then on a Windows test system:
