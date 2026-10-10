@@ -43,7 +43,7 @@ class GuiTests(unittest.TestCase):
             two.write_bytes(b"fake video")
 
             window = APP["VideoToAudioApp"]()
-        window.set_language("en")
+            window.set_language("en")
             window.add_files([str(one)])
             self.assertIsNone(window.output_dir)
             self.assertIn(str(first), window.output_label.text())
@@ -80,7 +80,7 @@ class GuiTests(unittest.TestCase):
             source = root / "example.mkv"
             source.write_bytes(b"fake video")
             window = APP["VideoToAudioApp"]()
-        window.set_language("en")
+            window.set_language("en")
             window.add_files([str(source)])
             with mock.patch.object(APP["QFileDialog"], "getExistingDirectory", return_value=""):
                 window.select_output_folder()
