@@ -91,6 +91,7 @@ class PackagingTests(unittest.TestCase):
         self.assertLess(setup.index(english), setup.index(portuguese))
         self.assertIn('LicenseFile: "..\\LICENSE"', setup)
         self.assertIn('LicenseFile: "..\\installer\\LICENSE.pt-BR.txt"', setup)
+        self.assertIn('Source: "..\\installer\\LICENSE.pt-BR.txt"; DestDir: "{app}"', setup)
 
         original = (ROOT / "LICENSE").read_text(encoding="utf-8").strip()
         localized = (ROOT / "installer" / "LICENSE.pt-BR.txt").read_text(
