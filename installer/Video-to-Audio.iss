@@ -35,10 +35,21 @@ VersionInfoProductVersion={#MyAppVersion}
 CloseApplications=yes
 RestartApplications=no
 LanguageDetectionMethod=none
+; Always start with English, even when upgrading an earlier Portuguese install.
+UsePreviousLanguage=no
+ShowLanguageDialog=yes
 
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\LICENSE"
 Name: "ptbr"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"; LicenseFile: "..\installer\LICENSE.pt-BR.txt"
+
+[Messages]
+; The language-selection dialog is shown before any new choice takes effect.
+; Show bilingual guidance so its meaning stays clear while changing the list.
+en.SelectLanguageTitle=Setup language / Idioma da instalação
+ptbr.SelectLanguageTitle=Setup language / Idioma da instalação
+en.SelectLanguageLabel=Select the installer language / Selecione o idioma do instalador:
+ptbr.SelectLanguageLabel=Select the installer language / Selecione o idioma do instalador:
 
 [CustomMessages]
 en.DesktopShortcut=Create a desktop shortcut
