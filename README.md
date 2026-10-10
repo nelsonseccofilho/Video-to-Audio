@@ -86,6 +86,19 @@ The output-folder experience follows the Nielsen Norman Group's principles of sy
 - **Desktop shortcut does not launch:** verify TargetPath, Arguments and WorkingDirectory, then run the terminal command above.
 - **PowerShell blocks Activate.ps1:** activation is unnecessary; use the venv Python executable instead.
 
+## Windows installer — preview
+
+The experimental installer is developed separately on branch **feat/windows-installer**.
+See the [installer build guide](docs/WINDOWS_INSTALLER.md) for a locally built executable and Setup.exe.
+
+When the branch is checked out, you can run the build on Windows with Python 3.12 and Inno Setup 6:
+
+~~~powershell
+.\venv\Scripts\python.exe .\build\windows\build.py
+~~~
+
+The script builds in its own .venv-build and **does not affect WhisperX**. It creates a testable standalone GUI and a versioned installer. This is **not yet an official release**: manual Windows installer testing and [third-party redistribution review](docs/THIRD_PARTY_NOTICES.md) are required. The PyQt5 library has GPLv3/commercial licensing and the bundled FFmpeg's license depends on its exact build configuration.
+
 ## Tests
 
 ~~~powershell
