@@ -6,14 +6,11 @@ strings. English remains the fallback for unknown keys or locales.
 
 from __future__ import annotations
 
-from PyQt5.QtCore import QLocale
-
-SUPPORTED_CHOICES = ("auto", "en", "pt_BR")
+SUPPORTED_CHOICES = ("en", "pt_BR")
 
 EN = {
     "window_title": "Video to Audio Converter",
     "language_label": "Language:",
-    "language_auto": "Automatic (Windows)",
     "language_en": "English",
     "language_pt": "Português (Brasil)",
     "videos_label": "Videos to convert",
@@ -74,7 +71,6 @@ EN = {
 PT_BR = {
     "window_title": "Conversor de Vídeo para Áudio",
     "language_label": "Idioma:",
-    "language_auto": "Automático (Windows)",
     "language_en": "English",
     "language_pt": "Português (Brasil)",
     "videos_label": "Vídeos para converter",
@@ -143,11 +139,8 @@ ERROR_KEYS = (
 
 
 def effective_language(choice: str, system_locale: str | None = None) -> str:
-    """Follow Windows locale on Auto; recognize regional variants of Portuguese."""
-    if choice in CATALOGS:
-        return choice
-    locale = (system_locale or QLocale.system().name()).lower()
-    return "pt_BR" if locale == "pt" or locale.startswith("pt_") else "en"
+    """Return the selected language, defaulting to English for legacy/unknown values."""
+    return choice if choice in CATALOGS else "en"
 
 
 def translate(lang: str, key: str, **values: object) -> str:
