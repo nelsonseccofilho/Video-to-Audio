@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 from threading import Event, Lock
 
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (
     QApplication, QComboBox, QFileDialog, QHBoxLayout, QLabel, QListWidget,
@@ -18,7 +18,7 @@ from PyQt5.QtWidgets import (
 
 from converter import (
     VIDEO_EXTENSIONS, ConversionCancelled, ConversionError,
-    available_output_path, convert_video,
+    available_output_path, convert_video, destination_folder,
 )
 
 ROOT = Path(__file__).resolve().parent
@@ -33,7 +33,7 @@ class ConvertThread(QThread):
     error_signal = pyqtSignal(str)
     result_signal = pyqtSignal(int, object, bool)
 
-    def __init__(self, paths: list[Path], fmt: str, output_dir: Path, bitrate: int):
+    def __init__(self, paths: list[Path], fmt: str, output_dir: Path | None, bitrate: int):
         super().__init__()
         self.paths = paths
         self.fmt = fmt
@@ -58,14 +58,16 @@ class ConvertThread(QThread):
     def run(self):
         completed = 0
         errors = []
-        reserved = set()
+        reserved_by_folder: dict[str, set[str]] = {}
         total = len(self.paths)
 
         for index, path in enumerate(self.paths):
             if self._cancelled.is_set():
                 break
             try:
-                destination = available_output_path(path, self.output_dir, self.fmt, reserved)
+                folder = destination_folder(path, self.output_dir)
+                reserved = reserved_by_folder.setdefault(str(folder).casefold(), set())
+                destination = available_output_path(path, folder, self.fmt, reserved)
 
                 def report(percent, i=index, name=path.name):
                     overall = min(100, int(100 * (i + percent / 100) / total))
@@ -102,7 +104,7 @@ class VideoToAudioApp(QMainWindow):
         super().__init__()
         self.setWindowTitle("Video to Audio Converter")
         self.setWindowIcon(icon("Video to Audio.png"))
-        self.resize(650, 480)
+        self.resize(650, 530)
         self.video_paths: list[Path] = []
         self.output_dir: Path | None = None
         self.worker: ConvertThread | None = None
@@ -146,13 +148,29 @@ class VideoToAudioApp(QMainWindow):
         layout.addLayout(settings)
         self._update_bitrate()
 
-        self.output_btn = QPushButton("Select Output Folder", self)
+        location_actions = QHBoxLayout()
+        self.output_btn = QPushButton("Choose output folder (optional)", self)
         self.output_btn.setIcon(icon("folder.png"))
         self.output_btn.clicked.connect(self.select_output_folder)
-        layout.addWidget(self.output_btn)
-        self.output_label = QLabel("Output folder: not selected", self)
+        location_actions.addWidget(self.output_btn)
+
+        self.original_btn = QPushButton("Use source folders", self)
+        self.original_btn.clicked.connect(self.use_original_folders)
+        location_actions.addWidget(self.original_btn)
+        layout.addLayout(location_actions)
+
+        self.output_label = QLabel(self)
         self.output_label.setWordWrap(True)
+        self.output_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
         layout.addWidget(self.output_label)
+
+        self.output_hint = QLabel(
+            "Videos are in different folders. To keep all audio together, "
+            "you can choose one output folder. This is optional.", self
+        )
+        self.output_hint.setWordWrap(True)
+        layout.addWidget(self.output_hint)
+        self._update_output_location()
 
         self.progress_bar = QProgressBar(self)
         self.progress_bar.setRange(0, 100)
@@ -193,6 +211,7 @@ class VideoToAudioApp(QMainWindow):
             self.video_list.addItem(path.name)
             self.video_list.item(self.video_list.count() - 1).setToolTip(str(path))
             seen.add(key)
+        self._update_output_location()
 
     def open_file_dialog(self):
         files, _ = QFileDialog.getOpenFileNames(
@@ -205,21 +224,68 @@ class VideoToAudioApp(QMainWindow):
         for row in sorted((self.video_list.row(item) for item in self.video_list.selectedItems()), reverse=True):
             self.video_list.takeItem(row)
             del self.video_paths[row]
+        if not self.video_paths:
+            self.output_dir = None
+        self._update_output_location()
 
     def clear_video_list(self):
         self.video_paths.clear()
         self.video_list.clear()
+        self.output_dir = None
+        self._update_output_location()
 
     def select_output_folder(self):
-        directory = QFileDialog.getExistingDirectory(self, "Select Output Folder")
+        initial = self.output_dir or (
+            self.video_paths[0].parent if self.video_paths else Path.home()
+        )
+        directory = QFileDialog.getExistingDirectory(
+            self, "Choose a common audio output folder (optional)", str(initial)
+        )
         if directory:
             self.output_dir = Path(directory)
-            self.output_label.setText(f"Output folder: {self.output_dir}")
+            self._update_output_location()
+
+    def use_original_folders(self):
+        self.output_dir = None
+        self._update_output_location()
+
+    def _update_output_location(self):
+        """Keep the actual save destination visible before conversion."""
+        folders = list(dict.fromkeys(str(path.parent) for path in self.video_paths))
+        if self.output_dir is not None:
+            self.output_label.setText(f"Save audio to: {self.output_dir} (chosen folder)")
+            self.output_label.setToolTip(str(self.output_dir))
+        elif not folders:
+            self.output_label.setText(
+                "Save audio to: Each video's original folder (automatic)"
+            )
+            self.output_label.setToolTip("")
+        elif len(folders) == 1:
+            self.output_label.setText(
+                f"Save audio to: {folders[0]} (same folder as the videos)"
+            )
+            self.output_label.setToolTip(folders[0])
+        else:
+            visible = "\n".join(f"• {folder}" for folder in folders[:3])
+            remaining = len(folders) - 3
+            if remaining > 0:
+                visible += f"\n... and {remaining} more (hover to see all)"
+            self.output_label.setText(
+                f"Save audio to: Original folders ({len(folders)} locations)\n{visible}"
+            )
+            self.output_label.setToolTip("\n".join(folders))
+
+        self.output_hint.setVisible(self.output_dir is None and len(folders) > 1)
+        self.original_btn.setEnabled(self.output_dir is not None)
+        for index, path in enumerate(self.video_paths):
+            self.video_list.item(index).setToolTip(
+                f"Source: {path}\nSave audio to: {destination_folder(path, self.output_dir)}"
+            )
 
     def _set_busy(self, busy):
         for control in (
             self.select_btn, self.remove_btn, self.clear_btn, self.format_combo,
-            self.output_btn, self.convert_btn, self.video_list,
+            self.output_btn, self.original_btn, self.convert_btn, self.video_list,
         ):
             control.setEnabled(not busy)
         if not busy:
@@ -231,10 +297,10 @@ class VideoToAudioApp(QMainWindow):
     def start_conversion(self):
         if self.worker is not None:
             return
-        if not self.video_paths or self.output_dir is None:
-            QMessageBox.warning(self, "Missing selection", "Select videos and an output folder.")
+        if not self.video_paths:
+            QMessageBox.warning(self, "Missing selection", "Select at least one video.")
             return
-        if not self.output_dir.is_dir():
+        if self.output_dir is not None and not self.output_dir.is_dir():
             QMessageBox.warning(self, "Missing folder", "The output folder no longer exists.")
             return
 
