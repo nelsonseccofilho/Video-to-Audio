@@ -28,6 +28,8 @@ The script:
 5. Checks that application executable, FFmpeg binary and icons exist.
 6. Calls Inno Setup and reports the installer's SHA256.
 
+This preview uses version 0.2.0 to distinguish the new pt-BR build from the earlier 0.1.0 test installation. The installer should upgrade an existing 0.1.0 install rather than creating a second application entry.
+
 Generated files:
 
 - Standalone app: dist\Video-to-Audio\Video-to-Audio.exe
@@ -62,6 +64,11 @@ First validate the existing app GUI on PR #1, then on a Windows test system:
 - [ ] Build passes tests and creates both files above (30 tests expected with pt-BR localization and post-conversion reset).
 - [ ] The standalone EXE starts by double-click, without a terminal window.
 - [ ] Convert one MKV to MP3 without picking a folder and play the audio.
+- [ ] After confirming a fully successful conversion, the input list is cleared and the final completion status remains visible.
+- [ ] After a failed/cancelled conversion, the input list is retained so the user can retry.
+- [ ] On Brazilian Portuguese Windows, the app defaults to Português (Brasil); language selector also supports English and Automatic (Windows).
+- [ ] Changing language updates labels, progress, warnings and output location; the manual language choice is kept on a new launch.
+- [ ] Installer wizard is available in English and Português Brasileiro; shortcuts, launch option and uninstall work in the chosen installer language.
 - [ ] Mixed-source batch saves beside each original and displays correct paths.
 - [ ] Shared folder and Use source folders actions work.
 - [ ] Cancel conversion and test duplicate filenames on test media.
@@ -69,7 +76,7 @@ First validate the existing app GUI on PR #1, then on a Windows test system:
 - [ ] Run the installed app without a Python install on PATH (ideally clean Windows VM).
 - [ ] Convert a short video using the installed app and listen to MP3.
 - [ ] Uninstall and confirm application files disappear but source videos/output audio remain.
-- [ ] Reinstall or upgrade without duplicate product entries.
+- [ ] Upgrade the previously installed 0.1.0 preview to 0.2.0 without duplicate product entries (AppId unchanged).
 - [ ] Resolve third-party binary redistribution requirements (THIRD_PARTY_NOTICES.md).
 - [ ] Review Windows SmartScreen: the preview installer is not code-signed.
 
