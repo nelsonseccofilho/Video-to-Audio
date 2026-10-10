@@ -1,4 +1,4 @@
-# Windows installer — candidate build 0.3.0
+# Windows installer — candidate build 0.3.1
 
 This is a **local preview build**, not a validated or published release.
 
@@ -28,12 +28,12 @@ The script:
 5. Checks that application executable, FFmpeg binary and icons exist.
 6. Calls Inno Setup and reports the installer's SHA256.
 
-This preview uses version 0.3.0 to distinguish the bilingual UX refinements from the tested 0.1.0 and 0.2.0 preview installers. The installer should upgrade an existing installation without creating a separate product entry (AppId is unchanged).
+This preview uses version 0.3.1 for the complete informational Portuguese license translation (the prior bilingual preview was 0.3.0). The installer should upgrade an existing installation without creating a separate product entry (AppId is unchanged).
 
 Generated files:
 
 - Standalone app: dist\Video-to-Audio\Video-to-Audio.exe
-- Local preview installer: dist\installer\Video-to-Audio-Setup-0.3.0.exe
+- Local preview installer: dist\installer\Video-to-Audio-Setup-0.3.1.exe
 
 If Inno Setup is not installed yet, create only the standalone GUI:
 
@@ -51,7 +51,7 @@ Do not commit dist, the generated build/pyinstaller directory, .venv-build or co
 
 ## Installer behavior
 
-The application UI and setup wizard are independently selectable. Choosing Portuguese for the setup wizard does not implicitly override the application default (English); the user can switch languages within the installed GUI and the selection persists. The operating system's native file picker may retain the Windows language by design. The Apache 2.0 source document stays in English, while the Portuguese license screen includes an informative preface. See https://www.apache.org/foundation/license-faq.html for the ASF's guidance on translations.
+The application UI and setup wizard are independently selectable. Choosing Portuguese for the setup wizard does not implicitly override the application default (English); the user can switch languages within the installed GUI and the selection persists. The operating system's native file picker may retain the Windows language by design. The Apache 2.0 source document remains in English, while the Portuguese license screen displays a full independent informational translation, followed by the complete authoritative original. Do not distribute the installer publicly until this translation and all third-party licenses are reviewed. See https://www.apache.org/foundation/license-faq.html for the ASF's guidance on translations.
 
 
 - Per-user installation in %LOCALAPPDATA%\Programs\Video-to-Audio without administrator privileges.
@@ -71,7 +71,9 @@ First validate the existing app GUI on PR #1, then on a Windows test system:
 - [ ] After a failed/cancelled conversion, the input list is retained so the user can retry.
 - [ ] The application starts in English on Windows regardless of OS locale. The language dropdown lists English first and Português (Brasil) second.
 - [ ] Switching English → Português (Brasil) → English immediately updates labels, progress, warnings, dialogs, and destination tooltips; the manually selected language is saved for subsequent launches.
-- [ ] Installer offers English first (default even on a pt-BR Windows machine or after upgrading a previously Portuguese installation) and Português Brasileiro second. `UsePreviousLanguage=no` deliberately prevents earlier installations from overriding the English starting choice. The initial language picker uses bilingual English/Portuguese instructions; wizard language changes take effect when the user confirms with OK. Each choice translates wizard controls and displays its matching license screen. The Portuguese screen begins with a nonbinding explanation and then includes the full authoritative English Apache 2.0 text.
+- [ ] In a clean installation, the app starts in English; after an explicit pt-BR choice, it remembers that preference on subsequent launches.
+- [ ] Installer offers English first (default even on a pt-BR Windows machine or after upgrading a previously Portuguese installation) and Português Brasileiro second. `UsePreviousLanguage=no` deliberately prevents earlier installations from overriding the English starting choice. The initial language picker uses bilingual English/Portuguese instructions; wizard language changes take effect when the user confirms with OK. Each choice translates wizard controls and displays its matching license screen. The Portuguese screen shows an independently prepared full informational translation of all nine Apache 2.0 sections and the appendix, followed by the complete authoritative English original. Verify the full document manually; the translation is **not officially endorsed or legally reviewed**.
+- [ ] The Portuguese license begins with a translation disclaimer, contains all nine sections and the appendix, and retains the English original at the end. Inspect for accuracy; no legal review has yet been completed.
 - [ ] Mixed-source batch saves beside each original and displays correct paths.
 - [ ] Shared folder and Use source folders actions work.
 - [ ] Cancel conversion and test duplicate filenames on test media.
@@ -79,7 +81,7 @@ First validate the existing app GUI on PR #1, then on a Windows test system:
 - [ ] Run the installed app without a Python install on PATH (ideally clean Windows VM).
 - [ ] Convert a short video using the installed app and listen to MP3.
 - [ ] Uninstall and confirm application files disappear but source videos/output audio remain.
-- [ ] Upgrade the installed 0.2.0 preview to 0.3.0 without duplicate product entries (AppId unchanged).
+- [ ] Upgrade the installed 0.3.0 preview to 0.3.1 without duplicate product entries (AppId unchanged).
 - [ ] Resolve third-party binary redistribution requirements (THIRD_PARTY_NOTICES.md).
 - [ ] Review Windows SmartScreen: the preview installer is not code-signed.
 
