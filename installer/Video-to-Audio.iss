@@ -1,5 +1,5 @@
 #define MyAppName "Video-to-Audio"
-#define MyAppVersion "0.2.0"
+#define MyAppVersion "0.3.0"
 #define MyAppExeName "Video-to-Audio.exe"
 #define MyAppPublisher "Video-to-Audio Contributors"
 #define MyAppURL "https://github.com/nelsonseccofilho/Video-to-Audio"
@@ -27,18 +27,18 @@ SetupIconFile=..\icons\icon.ico
 UninstallDisplayIcon={app}\{#MyAppExeName}
 OutputDir=..\dist\installer
 OutputBaseFilename={#MyAppName}-Setup-{#MyAppVersion}
-VersionInfoVersion=0.2.0.0
+VersionInfoVersion=0.3.0.0
 VersionInfoDescription=Video to Audio Converter Installer
 VersionInfoCompany={#MyAppPublisher}
 VersionInfoProductName={#MyAppName}
 VersionInfoProductVersion={#MyAppVersion}
-LicenseFile=..\LICENSE
 CloseApplications=yes
 RestartApplications=no
+LanguageDetectionMethod=none
 
 [Languages]
-Name: "en"; MessagesFile: "compiler:Default.isl"
-Name: "ptbr"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
+Name: "en"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\LICENSE"
+Name: "ptbr"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"; LicenseFile: "..\installer\LICENSE.pt-BR.txt"
 
 [CustomMessages]
 en.DesktopShortcut=Create a desktop shortcut
