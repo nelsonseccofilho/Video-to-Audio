@@ -73,18 +73,26 @@ def run_tests(python: Path) -> None:
     run(python, "-m", "unittest", "discover", "-s", "tests", "-v", env=env)
 
 
-def build_app(python: Path) -> Path:
-    run(
+def pyinstaller_command(python: Path) -> list[str | Path]:
+    """Use absolute asset paths because PyInstaller resolves data from --specpath."""
+    icons = (PROJECT / "icons").resolve()
+    if not icons.is_dir() or not (icons / "icon.ico").is_file():
+        raise RuntimeError(f"Application icons were not found at: {icons}")
+    return [
         python, "-m", "PyInstaller", "--clean", "--noconfirm",
         "--onedir", "--windowed", "--name", APP_NAME,
-        "--icon", PROJECT / "icons" / "icon.ico",
-        "--add-data", "icons:icons",
+        "--icon", icons / "icon.ico",
+        "--add-data", f"{icons}:icons",
         "--collect-all", "imageio_ffmpeg",
         "--distpath", PROJECT / "dist",
         "--workpath", PROJECT / "build" / "pyinstaller",
         "--specpath", PROJECT / "build" / "pyinstaller",
         PROJECT / "Video to Audio.py",
-    )
+    ]
+
+
+def build_app(python: Path) -> Path:
+    run(*pyinstaller_command(python))
 
     bundle = PROJECT / "dist" / APP_NAME
     executable = bundle / f"{APP_NAME}.exe"
