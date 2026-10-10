@@ -71,7 +71,7 @@ First validate the existing app GUI on PR #1, then on a Windows test system:
 - [ ] After a failed/cancelled conversion, the input list is retained so the user can retry.
 - [ ] The application starts in English on Windows regardless of OS locale. The language dropdown lists English first and Português (Brasil) second.
 - [ ] Switching English → Português (Brasil) → English immediately updates labels, progress, warnings, dialogs, and destination tooltips; the manually selected language is saved for subsequent launches.
-- [ ] Installer offers English first (default even on a pt-BR Windows machine) and Português Brasileiro second. Each choice translates wizard controls and displays its matching license screen. The Portuguese screen begins with a nonbinding explanation and then includes the full authoritative English Apache 2.0 text.
+- [ ] Installer offers English first (default even on a pt-BR Windows machine or after upgrading a previously Portuguese installation) and Português Brasileiro second. `UsePreviousLanguage=no` deliberately prevents earlier installations from overriding the English starting choice. The initial language picker uses bilingual English/Portuguese instructions; wizard language changes take effect when the user confirms with OK. Each choice translates wizard controls and displays its matching license screen. The Portuguese screen begins with a nonbinding explanation and then includes the full authoritative English Apache 2.0 text.
 - [ ] Mixed-source batch saves beside each original and displays correct paths.
 - [ ] Shared folder and Use source folders actions work.
 - [ ] Cancel conversion and test duplicate filenames on test media.
