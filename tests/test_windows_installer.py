@@ -69,3 +69,14 @@ class PackagingTests(unittest.TestCase):
         self.assertIn("ptbr.LaunchApp=", script)
         self.assertIn('Description: "{cm:DesktopShortcut}"', script)
         self.assertIn('Description: "{cm:LaunchApp}"', script)
+
+    def test_build_runs_syntax_gate_before_dependency_installation(self):
+        builder = SCRIPT.read_text(encoding="utf-8")
+        self.assertIn('def check_source_syntax(python: Path)', builder)
+        self.assertIn('PROJECT / "i18n.py"', builder)
+        self.assertIn('PROJECT / "tests"', builder)
+        self.assertIn('PROJECT / "build" / "windows" / "build.py"', builder)
+        self.assertLess(
+            builder.index("    check_source_syntax(Path(sys.executable))"),
+            builder.index("    python = ensure_build_environment()"),
+        )
