@@ -21,12 +21,12 @@ SPEC.loader.exec_module(windows_build)
 
 class PackagingTests(unittest.TestCase):
     def test_version_matches_inno_and_expected_output(self):
-        self.assertEqual(windows_build.VERSION, "0.1.0")
+        self.assertEqual(windows_build.VERSION, "0.2.0")
         self.assertEqual(windows_build.APP_NAME, "Video-to-Audio")
         installer = (ROOT / "installer" / "Video-to-Audio.iss").read_text(
             encoding="utf-8"
         )
-        self.assertIn('#define MyAppVersion "0.1.0"', installer)
+        self.assertIn('#define MyAppVersion "0.2.0"', installer)
         self.assertIn("PrivilegesRequired=lowest", installer)
         self.assertIn("DefaultDirName={localappdata}", installer)
         self.assertIn("UninstallDisplayIcon=", installer)
