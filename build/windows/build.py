@@ -17,7 +17,7 @@ from pathlib import Path
 PROJECT = Path(__file__).resolve().parents[2]
 BUILD_VENV = PROJECT / ".venv-build"
 APP_NAME = "Video-to-Audio"
-VERSION = "0.3.0"
+VERSION = "0.3.1"
 
 
 def python_in(venv: Path) -> Path:
