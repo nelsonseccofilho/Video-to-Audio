@@ -78,3 +78,18 @@ Get-FileHash .\dist\installer\Video-to-Audio-Setup-0.3.1.exe -Algorithm SHA256
 - https://doc.qt.io/qtforpython-6/licenses.html
 
 This is a technical evidence assessment, not legal advice or certification.
+
+## Update — GPLv3 preparation approved (2026-10-10)
+
+The project owner requested a **free and open-source** distribution and explicitly authorized pursuing the GPLv3 route with the existing PyQt5 dependency. The owner also reported a **US$20 GitHub balance** preventing hosted GitHub Actions use. Accordingly, the red remote check results are not treated as evidence of Python code failure; an accurately documented **local QA evidence path** is accepted for this workstream, subject to review of the actual records.
+
+**Staged on PR #2:**
+- Full GPLv3 text (LICENSES/GPL-3.0-only.txt) and imageio-ffmpeg BSD-2-Clause notice, preserving the upstream Apache-2.0 LICENSE unchanged.
+- Proposed copyright/license boundaries in docs/OPEN_SOURCE_DISTRIBUTION_POLICY.md. This applies only to contributions under the respective contributors' control and does not unilaterally relicense other authors' works.
+- Installer rules now copy the GPLv3 and BSD notice texts in addition to the existing Apache original, informational translation and preliminary notices.
+- scripts/audit_windows_distribution.ps1 collects the actual package files and SHA256 values, FFmpeg version/buildconf/license output, exact Python build dependency versions and local tests into ignored dist/audit/.
+- An additional static packaging test checks the presence of these materials.
+
+**Remaining hard blockers for public EXE:** obtain the generated local audit report and independently inspect FFmpeg configure flags/source license, Qt/PyQt library notices and compliance, appropriate corresponding source delivery, contributor/license headers and UI licensing notices. Existing setup license page still represents Apache-2.0 and needs adjustment to describe the combined GPLv3 distribution accurately. The unofficial Portuguese translation remains subject to independent review.
+
+**Decision:** GPLv3 strategy approved in principle; **public binary distribution NOT approved**. Keep both PRs open until final compliance, provenance and technical review. Local QA is a documented alternative while hosted runners are unavailable; it does not turn failed GitHub Actions checks green.
