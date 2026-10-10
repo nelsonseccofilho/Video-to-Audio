@@ -24,7 +24,7 @@ The script:
 1. Finds Inno Setup's ISCC.exe.
 2. Creates an isolated .venv-build and installs dependencies.
 3. Runs automated tests.
-4. Uses PyInstaller with onedir + windowed settings to bundle the GUI, icons and FFmpeg.
+4. Uses PyInstaller with onedir + windowed settings to bundle the GUI, icons and FFmpeg. Resource paths are absolute because PyInstaller resolves added data relative to the generated spec file under build/pyinstaller.
 5. Checks that application executable, FFmpeg binary and icons exist.
 6. Calls Inno Setup and reports the installer's SHA256.
 
@@ -45,7 +45,7 @@ If it is installed in a nonstandard location:
 .\venv\Scripts\python.exe .\build\windows\build.py --iscc "C:\YourPath\ISCC.exe"
 ~~~
 
-Do not commit dist, build, .venv-build or converted audio files.
+Do not commit dist, the generated build/pyinstaller directory, .venv-build or converted audio files. Source-controlled build/windows scripts must remain tracked.
 
 ## Installer behavior
 
@@ -59,7 +59,7 @@ Do not commit dist, build, .venv-build or converted audio files.
 
 First validate the existing app GUI on PR #1, then on a Windows test system:
 
-- [ ] Build passes tests and creates both files above.
+- [ ] Build passes tests and creates both files above (20 tests expected after icon-path regression coverage).
 - [ ] The standalone EXE starts by double-click, without a terminal window.
 - [ ] Convert one MKV to MP3 without picking a folder and play the audio.
 - [ ] Mixed-source batch saves beside each original and displays correct paths.
