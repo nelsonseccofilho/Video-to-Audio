@@ -46,3 +46,17 @@ class LocalizationTests(unittest.TestCase):
             translate_failure("pt_BR", "Unknown FFmpeg failure"),
             "Unknown FFmpeg failure",
         )
+
+    def test_completion_messages_use_natural_portuguese_plurals(self):
+        self.assertEqual(
+            translate("pt_BR", "complete", completed=1),
+            "Concluído: 1 arquivo convertido.",
+        )
+        self.assertEqual(
+            translate("pt_BR", "complete", completed=3),
+            "Concluído: 3 arquivos convertidos.",
+        )
+        self.assertEqual(
+            translate("pt_BR", "cancelled", completed=1),
+            "Cancelado. 1 arquivo concluído.",
+        )
