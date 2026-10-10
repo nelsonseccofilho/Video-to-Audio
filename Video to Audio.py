@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 from threading import Event, Lock
 
-from PyQt5.QtCore import Qt, QSettings, QThread, pyqtSignal
+from PyQt5.QtCore import QLibraryInfo, QSettings, QThread, QTranslator, Qt, pyqtSignal
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (
     QApplication, QComboBox, QFileDialog, QHBoxLayout, QLabel, QListWidget,
@@ -107,7 +107,7 @@ class VideoToAudioApp(QMainWindow):
         self.setWindowIcon(icon("Video to Audio.png"))
         self.resize(650, 560)
         self.settings = QSettings("Video-to-Audio", "Video-to-Audio")
-        self.language_choice = str(self.settings.value("ui/language", "auto"))
+        self.language_choice = str(self.settings.value("ui/language", "en"))
         if self.language_choice not in SUPPORTED_CHOICES:
             self.language_choice = "auto"
         self.language = effective_language(self.language_choice)
@@ -117,6 +117,7 @@ class VideoToAudioApp(QMainWindow):
         self.output_dir: Path | None = None
         self.worker: ConvertThread | None = None
         self._close_when_finished = False
+        self._qt_translator = QTranslator(self)
         self._build_ui()
         self._apply_language()
 
@@ -129,9 +130,9 @@ class VideoToAudioApp(QMainWindow):
         self.language_label = QLabel(self)
         locale_row.addWidget(self.language_label)
         self.language_combo = QComboBox(self)
-        self.language_combo.addItem("", "auto")
-        self.language_combo.addItem("", "pt_BR")
+        # List language names alphabetically; launch in English by default.
         self.language_combo.addItem("", "en")
+        self.language_combo.addItem("", "pt_BR")
         self.language_combo.setCurrentIndex(
             self.language_combo.findData(self.language_choice)
         )
@@ -243,14 +244,29 @@ class VideoToAudioApp(QMainWindow):
         self.language_combo.blockSignals(was_blocked)
         self._apply_language()
 
+    def _load_qt_translation(self):
+        """Translate Qt-managed dialog controls where language packs are available."""
+        app = QApplication.instance()
+        if app is None:
+            return
+        app.removeTranslator(self._qt_translator)
+        self._qt_translator = QTranslator(self)
+        if self.language == "en":
+            return
+        translations = Path(QLibraryInfo.location(QLibraryInfo.TranslationsPath))
+        for name in ("qtbase_pt_BR", "qtbase_pt", "qt_pt_BR", "qt_pt"):
+            if self._qt_translator.load(name, str(translations)):
+                app.installTranslator(self._qt_translator)
+                break
+
     def _apply_language(self):
         self.language = effective_language(self.language_choice)
         self.setWindowTitle(self._t("window_title"))
         self.language_label.setText(self._t("language_label"))
+        self._load_qt_translation()
         for choice, key in (
-            ("auto", "language_auto"),
-            ("pt_BR", "language_pt"),
             ("en", "language_en"),
+            ("pt_BR", "language_pt"),
         ):
             self.language_combo.setItemText(
                 self.language_combo.findData(choice), self._t(key)
