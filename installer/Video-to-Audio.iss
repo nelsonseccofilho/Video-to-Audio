@@ -36,8 +36,20 @@ LicenseFile=..\LICENSE
 CloseApplications=yes
 RestartApplications=no
 
+[Languages]
+Name: "en"; MessagesFile: "compiler:Default.isl"
+Name: "ptbr"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
+
+[CustomMessages]
+en.DesktopShortcut=Create a desktop shortcut
+ptbr.DesktopShortcut=Criar um atalho na área de trabalho
+en.AdditionalShortcuts=Additional shortcuts:
+ptbr.AdditionalShortcuts=Atalhos adicionais:
+en.LaunchApp=Launch Video-to-Audio
+ptbr.LaunchApp=Executar Video-to-Audio
+
 [Tasks]
-Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription: "Additional shortcuts:"; Flags: unchecked
+Name: "desktopicon"; Description: "{cm:DesktopShortcut}"; GroupDescription: "{cm:AdditionalShortcuts}"; Flags: unchecked
 
 [Files]
 Source: "..\dist\Video-to-Audio\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -49,4 +61,4 @@ Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{a
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Description: "Launch {#MyAppName}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchApp}"; Flags: nowait postinstall skipifsilent
