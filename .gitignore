@@ -1,6 +1,7 @@
 # Local Python environments and caches
 venv/
 .venv/
+.venv-build/
 __pycache__/
 *.py[cod]
 .pytest_cache/
