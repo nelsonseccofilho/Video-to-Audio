@@ -11,11 +11,24 @@ This file documents components included in the Windows app and matters that **mu
 | FFmpeg executable supplied by imageio-ffmpeg | Video/audio conversion | **LGPL or GPL depending on exact FFmpeg build configuration and included codecs.** Verify binary version/configuration and corresponding license/source before public redistribution. | [FFmpeg license](https://ffmpeg.org/legal.html) |
 | PyInstaller | Packaging-time tool | License and bundled bootloader notices must be respected. | [PyInstaller](https://pyinstaller.org/en/stable/license.html) |
 
+## Chosen open-source route (in preparation)
+
+The project owner intends to distribute the **combined desktop application under GPLv3 terms**, without charge, using the GPLv3 edition of PyQt5. The original upstream Apache-2.0 code retains its own license and attribution. See [open-source distribution policy](OPEN_SOURCE_DISTRIBUTION_POLICY.md).
+
+Full license texts already staged for the preview include:
+- Apache-2.0, still in the repository root **LICENSE**.
+- GPLv3, in **LICENSES/GPL-3.0-only.txt**.
+- imageio-ffmpeg's BSD-2-Clause notice, in **LICENSES/BSD-2-Clause-imageio-ffmpeg.txt**.
+
+**This is not a complete binary-license package.** We still need the actual shipped Qt module terms/notices/source provisions, FFmpeg's *precise* build/license/source, the app's GPL notice/source access, and review of the installer license-selection page, which currently presents Apache-2.0 only. The presence of a GPL text does not certify compliance.
+
+To collect evidence against the exact binary locally, run **scripts/audit_windows_distribution.ps1** after building. It writes ignored data to **dist/audit/**; inspect logs for private paths before sharing.
+
 ## Release gate
 
 **Local preview builds are permitted for functional testing, but do not publish the installer to GitHub Releases until:**
 
-1. The implications of packaging the **GPL v3 version of PyQt5** with this Apache-licensed upstream project are assessed and the chosen licensing/distribution model is documented. Switching to an LGPL-licensed Qt binding (e.g. PySide6) may be evaluated as a separate code change rather than silently changing this validated GUI.
+1. Finalize the chosen GPLv3 combined-distribution model, verify ownership and source-file license/attribution notices, provide access to complete corresponding source and update the installer-facing license screen (the current one is Apache-centric). Switching to an LGPL-licensed Qt binding (e.g. PySide6) may be evaluated as a separate code change rather than silently changing this validated GUI.
 2. Exact Qt, imageio-ffmpeg and FFmpeg binaries are inventoried from the built distribution, with their versions, build flags and licensing verified.
 3. Appropriate complete license texts, copyright notices, offer/source access where required, and attribution are included with the distributed installation.
 4. A public release review confirms that no component was built using a non-redistributable configuration (e.g. an FFmpeg build with --enable-nonfree).
@@ -23,4 +36,4 @@ This file documents components included in the Windows app and matters that **mu
 
 For the FFmpeg build configuration, run the packaged executable in the preview distribution with the -version flag and preserve its output in the release audit. For PyQt5 licensing, consult the official Riverbank Computing FAQ rather than assuming PyQt5 uses Qt's LGPL license.
 
-The application itself has not been relicensed and no legal conclusion is implied by these notes.
+The full distribution plan is **not yet approved**. Original Apache portions have not been relicensed; any new GPL-covered contributions must retain contributor attribution and appropriate license notices. No legal conclusion is implied by these notes.
