@@ -4,6 +4,7 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import imageio_ffmpeg
 
@@ -103,3 +104,25 @@ class FFmpegIntegrationTests(unittest.TestCase):
         missing = self.folder / "missing.mkv"
         with self.assertRaisesRegex(ConversionError, "not found"):
             convert_video(missing, self.folder / "missing.mp3", "mp3", 128)
+
+    def test_copy_fallback_keeps_existing_output_on_race(self):
+        video = self.folder / "input.mkv"
+        self._generate(video)
+        output = self.folder / "input.mp3"
+
+        def concurrent_output(_src, dst):
+            Path(dst).write_bytes(b"another process")
+            raise OSError("Hardlinks unavailable")
+
+        with mock.patch("converter.os.link", side_effect=concurrent_output):
+            with self.assertRaisesRegex(ConversionError, "already exists"):
+                convert_video(video, output, "mp3", 128)
+        self.assertEqual(output.read_bytes(), b"another process")
+
+    def test_copy_fallback_succeeds_without_hardlinks(self):
+        video = self.folder / "input.mkv"
+        self._generate(video)
+        output = self.folder / "input.mp3"
+        with mock.patch("converter.os.link", side_effect=OSError("Unavailable")):
+            convert_video(video, output, "mp3", 128)
+        self.assertGreater(output.stat().st_size, 1000)
