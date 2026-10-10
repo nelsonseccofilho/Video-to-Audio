@@ -24,6 +24,17 @@ Full license texts already staged for the preview include:
 
 To collect evidence against the exact binary locally, run **scripts/audit_windows_distribution.ps1** after building. It writes ignored data to **dist/audit/**; inspect logs for private paths before sharing.
 
+## Confirmed bundled FFmpeg from 0.3.1 Windows audit
+
+A local evidence archive identifies exactly one FFmpeg executable:
+
+- `ffmpeg-win-x86_64-v7.1.exe`, Gyan.dev 7.1 essentials build, SHA256 `2ce797a0f88d7f067180338fb227f7b1928ea727bd9a4d7a1d022f7c52af71a3`.
+- Its own `-L` output declares **GNU GPL version 3 or later**.
+- `-buildconf` confirms `--enable-gpl`, `--enable-version3`, `--enable-static`, `--enable-libx264`, and `--enable-libx265`; `--enable-nonfree` was **not reported**.
+- Evidence also recorded `PyQt5==5.15.11`, `PyQt5-Qt5==5.15.2`, `PyQt5_sip==12.20.0`, and `imageio-ffmpeg==0.6.0`.
+
+The precise **FFmpeg corresponding source**, its linked components, and exact Qt DLL/plugin licensing/source materials remain outstanding. A GPLv3 text without required source access is **not** sufficient to authorize publication. See [binary audit](FFMPEG_BINARY_AUDIT_0.3.1.md). This is distinct from a package named `imageio-ffmpeg` having a BSD-2-Clause Python wrapper.
+
 ## Release gate
 
 **Local preview builds are permitted for functional testing, but do not publish the installer to GitHub Releases until:**
