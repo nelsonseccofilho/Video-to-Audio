@@ -10,7 +10,7 @@ import imageio_ffmpeg
 
 from converter import (
     ConversionCancelled, ConversionError, available_output_path,
-    convert_video, duration_seconds, probe_media, progress_seconds,
+    convert_video, destination_folder, duration_seconds, probe_media, progress_seconds,
 )
 
 
@@ -42,6 +42,14 @@ class ParsingAndNamingTests(unittest.TestCase):
                 convert_video(file, file.with_suffix(".flac"), "flac", 128)
             with self.assertRaisesRegex(ConversionError, "Unsupported bitrate"):
                 convert_video(file, file.with_suffix(".mp3"), "mp3", 17)
+
+    def test_default_and_explicit_output_folder(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "source" / "recording.mkv"
+            shared = root / "output"
+            self.assertEqual(destination_folder(source), source.parent)
+            self.assertEqual(destination_folder(source, shared), shared)
 
     def test_cancel_before_start(self):
         with tempfile.TemporaryDirectory() as directory:
