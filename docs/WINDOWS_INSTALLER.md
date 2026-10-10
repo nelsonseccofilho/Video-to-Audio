@@ -1,4 +1,4 @@
-# Windows installer — candidate build 0.1.0
+# Windows installer — candidate build 0.2.0
 
 This is a **local preview build**, not a validated or published release.
 
@@ -31,7 +31,7 @@ The script:
 Generated files:
 
 - Standalone app: dist\Video-to-Audio\Video-to-Audio.exe
-- Local preview installer: dist\installer\Video-to-Audio-Setup-0.1.0.exe
+- Local preview installer: dist\installer\Video-to-Audio-Setup-0.2.0.exe
 
 If Inno Setup is not installed yet, create only the standalone GUI:
 
@@ -59,7 +59,7 @@ Do not commit dist, the generated build/pyinstaller directory, .venv-build or co
 
 First validate the existing app GUI on PR #1, then on a Windows test system:
 
-- [ ] Build passes tests and creates both files above (20 tests expected after icon-path regression coverage).
+- [ ] Build passes tests and creates both files above (30 tests expected with pt-BR localization and post-conversion reset).
 - [ ] The standalone EXE starts by double-click, without a terminal window.
 - [ ] Convert one MKV to MP3 without picking a folder and play the audio.
 - [ ] Mixed-source batch saves beside each original and displays correct paths.
