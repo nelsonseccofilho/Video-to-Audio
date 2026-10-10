@@ -22,7 +22,7 @@ cd D:\git\Video-to-Audio
 The script:
 
 1. Finds Inno Setup's ISCC.exe.
-2. Creates an isolated .venv-build and installs dependencies.
+2. Checks Python syntax first (including i18n.py and test files), then creates an isolated .venv-build and installs dependencies.
 3. Runs automated tests.
 4. Uses PyInstaller with onedir + windowed settings to bundle the GUI, icons and FFmpeg. Resource paths are absolute because PyInstaller resolves added data relative to the generated spec file under build/pyinstaller.
 5. Checks that application executable, FFmpeg binary and icons exist.
@@ -61,7 +61,7 @@ Do not commit dist, the generated build/pyinstaller directory, .venv-build or co
 
 First validate the existing app GUI on PR #1, then on a Windows test system:
 
-- [ ] Build passes tests and creates both files above (30 tests expected with pt-BR localization and post-conversion reset).
+- [ ] Build passes tests and creates both files above (31 tests expected with pt-BR localization, post-conversion reset and syntax preflight).
 - [ ] The standalone EXE starts by double-click, without a terminal window.
 - [ ] Convert one MKV to MP3 without picking a folder and play the audio.
 - [ ] After confirming a fully successful conversion, the input list is cleared and the final completion status remains visible.
