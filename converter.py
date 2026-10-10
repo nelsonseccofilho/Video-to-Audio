@@ -47,6 +47,11 @@ def progress_seconds(value: str) -> float | None:
     return int(hours) * 3600 + int(minutes) * 60 + float(seconds)
 
 
+def destination_folder(source: Path, selected_folder: Path | None = None) -> Path:
+    """Use the source video's folder unless the user chooses a shared destination."""
+    return Path(selected_folder) if selected_folder is not None else Path(source).parent
+
+
 def available_output_path(source: Path, output_dir: Path, fmt: str, reserved: set[str]) -> Path:
     """Reserve a unique filename, even with repeated basenames in a batch."""
     stem = source.stem
