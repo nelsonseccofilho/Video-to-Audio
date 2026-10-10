@@ -331,25 +331,25 @@ class VideoToAudioApp(QMainWindow):
         """Keep the actual save destination visible before conversion."""
         folders = list(dict.fromkeys(str(path.parent) for path in self.video_paths))
         if self.output_dir is not None:
-            self.output_label.setText(f"Save audio to: {self.output_dir} (chosen folder)")
+            self.output_label.setText(
+                self._t("destination_custom", folder=self.output_dir)
+            )
             self.output_label.setToolTip(str(self.output_dir))
         elif not folders:
-            self.output_label.setText(
-                "Save audio to: Each video's original folder (automatic)"
-            )
+            self.output_label.setText(self._t("destination_none"))
             self.output_label.setToolTip("")
         elif len(folders) == 1:
             self.output_label.setText(
-                f"Save audio to: {folders[0]} (same folder as the videos)"
+                self._t("destination_single", folder=folders[0])
             )
             self.output_label.setToolTip(folders[0])
         else:
             visible = "\n".join(f"• {folder}" for folder in folders[:3])
             remaining = len(folders) - 3
             if remaining > 0:
-                visible += f"\n... and {remaining} more (hover to see all)"
+                visible += "\n" + self._t("destination_more", count=remaining)
             self.output_label.setText(
-                f"Save audio to: Original folders ({len(folders)} locations)\n{visible}"
+                self._t("destination_multiple", count=len(folders), folders=visible)
             )
             self.output_label.setToolTip("\n".join(folders))
 
@@ -357,13 +357,17 @@ class VideoToAudioApp(QMainWindow):
         self.original_btn.setEnabled(self.output_dir is not None)
         for index, path in enumerate(self.video_paths):
             self.video_list.item(index).setToolTip(
-                f"Source: {path}\nSave audio to: {destination_folder(path, self.output_dir)}"
+                self._t(
+                    "destination_tooltip", source=path,
+                    folder=destination_folder(path, self.output_dir),
+                )
             )
 
     def _set_busy(self, busy):
         for control in (
             self.select_btn, self.remove_btn, self.clear_btn, self.format_combo,
             self.output_btn, self.original_btn, self.convert_btn, self.video_list,
+            self.language_combo,
         ):
             control.setEnabled(not busy)
         if not busy:
@@ -377,10 +381,14 @@ class VideoToAudioApp(QMainWindow):
         if self.worker is not None:
             return
         if not self.video_paths:
-            QMessageBox.warning(self, "Missing selection", "Select at least one video.")
+            QMessageBox.warning(
+                self, self._t("missing_selection_title"), self._t("missing_selection")
+            )
             return
         if self.output_dir is not None and not self.output_dir.is_dir():
-            QMessageBox.warning(self, "Missing folder", "The output folder no longer exists.")
+            QMessageBox.warning(
+                self, self._t("missing_folder_title"), self._t("missing_folder")
+            )
             return
 
         self.worker = ConvertThread(
@@ -391,36 +399,56 @@ class VideoToAudioApp(QMainWindow):
         self.worker.result_signal.connect(self._on_result)
         self.worker.finished.connect(self._on_thread_finished)
         self.progress_bar.setValue(0)
-        self.progress_label.setText("Starting conversion...")
+        self._set_status("starting")
         self._set_busy(True)
         self.worker.start()
 
     def _on_progress(self, overall, current, name):
         self.progress_bar.setValue(overall)
-        self.progress_label.setText(f"{name}: {current}% (batch: {overall}%)")
+        self._set_status("progress", name=name, current=current, overall=overall)
 
     def cancel_conversion(self):
         if self.worker is not None:
             self.worker.cancel()
             self.cancel_btn.setEnabled(False)
-            self.progress_label.setText("Cancelling conversion...")
+            self._set_status("cancelling")
 
     def _on_result(self, completed, errors, cancelled):
         if self._close_when_finished:
             return
         if cancelled:
-            self.progress_label.setText(f"Cancelled. {completed} file(s) completed.")
-            QMessageBox.information(self, "Cancelled", self.progress_label.text())
+            self._set_status("cancelled", completed=completed)
+            QMessageBox.information(
+                self, self._t("cancelled_title"), self.progress_label.text()
+            )
         elif errors:
-            self.progress_label.setText(f"Finished: {completed} succeeded, {len(errors)} failed.")
-            details = "\n".join(errors[:10])
+            self._set_status("partial", completed=completed, failed=len(errors))
+            details = "\n".join(
+                self._localized_error(error) for error in errors[:10]
+            )
             if len(errors) > 10:
-                details += f"\n...and {len(errors) - 10} more."
-            QMessageBox.warning(self, "Conversion results", self.progress_label.text() + "\n\n" + details)
+                details += "\n" + self._t(
+                    "more_errors", count=len(errors) - 10
+                )
+            QMessageBox.warning(
+                self, self._t("results_title"),
+                self.progress_label.text() + "\n\n" + details,
+            )
         else:
             self.progress_bar.setValue(100)
-            self.progress_label.setText(f"Complete: {completed} file(s) converted.")
-            QMessageBox.information(self, "Complete", self.progress_label.text())
+            self._set_status("complete", completed=completed)
+            QMessageBox.information(
+                self, self._t("complete_title"), self.progress_label.text()
+            )
+            # A new batch starts with an empty list. Keep the 100% progress
+            # and completion status as confirmation of the finished operation.
+            self.clear_video_list()
+
+    def _localized_error(self, error: str) -> str:
+        filename, separator, reason = error.partition(": ")
+        if not separator:
+            return translate_failure(self.language, error)
+        return filename + separator + translate_failure(self.language, reason)
 
     def _on_thread_finished(self):
         self.worker = None
