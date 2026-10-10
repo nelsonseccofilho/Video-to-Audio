@@ -86,6 +86,11 @@ class PackagingTests(unittest.TestCase):
             encoding="utf-8"
         )
         self.assertIn("LanguageDetectionMethod=none", setup)
+        # An upgrade must not silently preselect Portuguese from the last install.
+        self.assertIn("UsePreviousLanguage=no", setup)
+        self.assertIn("ShowLanguageDialog=yes", setup)
+        self.assertIn("en.SelectLanguageTitle=Setup language / Idioma da instalação", setup)
+        self.assertIn("ptbr.SelectLanguageLabel=Select the installer language / Selecione o idioma do instalador:", setup)
         english = 'Name: "en"; MessagesFile: "compiler:Default.isl";'
         portuguese = 'Name: "ptbr"; MessagesFile: "compiler:Languages\\BrazilianPortuguese.isl";'
         self.assertLess(setup.index(english), setup.index(portuguese))
