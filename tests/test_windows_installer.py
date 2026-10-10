@@ -117,3 +117,29 @@ class PackagingTests(unittest.TestCase):
         self.assertIn("APÊNDICE: Como aplicar a Licença Apache", localized)
         self.assertIn("ÚNICA VERSÃO JURIDICAMENTE VINCULANTE", localized)
         self.assertTrue(localized.rstrip().endswith(original))
+
+    def test_includes_full_gpl_and_bsd_texts_in_installer(self):
+        setup = (ROOT / "installer" / "Video-to-Audio.iss").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            'Source: "..\\LICENSES\\GPL-3.0-only.txt"; DestDir: "{app}\\licenses"',
+            setup,
+        )
+        self.assertIn(
+            'Source: "..\\LICENSES\\BSD-2-Clause-imageio-ffmpeg.txt"; '
+            'DestDir: "{app}\\licenses"',
+            setup,
+        )
+        self.assertIn('Source: "..\\LICENSE"; DestDir: "{app}"', setup)
+        gpl = (ROOT / "LICENSES" / "GPL-3.0-only.txt").read_text(encoding="utf-8")
+        bsd = (ROOT / "LICENSES" / "BSD-2-Clause-imageio-ffmpeg.txt").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("GNU GENERAL PUBLIC LICENSE", gpl)
+        self.assertIn("Version 3, 29 June 2007", gpl)
+        self.assertIn("BSD 2-Clause License", bsd)
+        self.assertIn("imageio", bsd)
+        audit_script = ROOT / "scripts" / "audit_windows_distribution.ps1"
+        self.assertTrue(audit_script.is_file())
+        self.assertIn("ffmpeg-inventory.json", audit_script.read_text(encoding="utf-8"))
