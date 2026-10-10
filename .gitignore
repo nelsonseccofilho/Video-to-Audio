@@ -7,7 +7,7 @@ __pycache__/
 .pytest_cache/
 
 # Packaging and editor artifacts
-build/
+build/pyinstaller/
 dist/
 *.egg-info/
 .vscode/
