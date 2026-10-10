@@ -13,6 +13,8 @@ A desktop video-to-audio converter for Windows, based on [NSTechBytes/Video-to-A
 - Keep the interface responsive with a background worker.
 - Launch from the Windows Start menu using pythonw.exe without opening a terminal.
 - Use a private Python virtual environment; no changes to system Python or WhisperX.
+- Choose **English** (default) or **Português (Brasil)**; switching updates the interface immediately and saves the preference.
+- Clear the input list automatically after a fully successful conversion; keep it on errors or cancellation.
 
 ## Windows / PowerShell installation
 
@@ -70,6 +72,10 @@ You can now search for **Video-to-Audio** from Start and pin it. If you have alr
 6. Follow real conversion and batch progress. Press **Cancel** to stop.
 7. Existing output files are never intentionally replaced; a numbered filename is chosen when necessary.
 
+After all files convert successfully, select **OK** on the completion dialog: the input list and any manually selected output folder are cleared for the next batch. The progress bar and completion message stay visible as confirmation. If a batch fails or is cancelled, the list remains available to retry.
+
+The **Language / Idioma** selector lists two options alphabetically: English (the default) and Português (Brasil). Changing the selection retranslates the application immediately, including its buttons, status, paths, messages and tooltips, and saves the preference. The Windows installer separately supports English by default and Brazilian Portuguese. The Portuguese legal screen includes an **informational translation** of Apache-2.0 and its authoritative English text. **The installer legal screen still needs revision before GPLv3 binary redistribution; it does not yet explain every included license.**
+
 WAV uses uncompressed 16-bit PCM and ignores the bitrate option. A raw AAC output is an ADTS audio file. An input without an audio stream is reported as a failed file, and remaining files continue processing. If a media file does not report its duration, per-file progress may stay at its starting value until conversion completes.
 
 On cancellation or an FFmpeg error, the current temporary output is deleted. Already completed audio files are kept.
@@ -86,6 +92,19 @@ The output-folder experience follows the Nielsen Norman Group's principles of sy
 - **Desktop shortcut does not launch:** verify TargetPath, Arguments and WorkingDirectory, then run the terminal command above.
 - **PowerShell blocks Activate.ps1:** activation is unnecessary; use the venv Python executable instead.
 
+## Windows installer — preview
+
+The preview installer is developed separately on branch **feat/windows-installer**. The English-first bilingual build with a complete pt-BR informational license translation is **0.3.1** (not an official public release).
+See the [installer build guide](docs/WINDOWS_INSTALLER.md) for a locally built executable and Setup.exe.
+
+When the branch is checked out, you can run the build on Windows with Python 3.12 and Inno Setup 6:
+
+~~~powershell
+.\venv\Scripts\python.exe .\build\windows\build.py
+~~~
+
+The script builds in its own .venv-build and **does not affect WhisperX**. It creates a testable standalone GUI and a versioned installer. This is **not yet an official release**: manual Windows installer testing and [third-party redistribution review](docs/THIRD_PARTY_NOTICES.md) are required. The PyQt5 library has GPLv3/commercial licensing and the bundled FFmpeg's license depends on its exact build configuration.
+
 ## Tests
 
 ~~~powershell
@@ -98,4 +117,8 @@ Tests include FFmpeg extraction to all three formats, filename conflicts, audio-
 
 Originally created by **Nasir Shahbaz** for [NSTechBytes](https://github.com/NSTechBytes). This repository includes additional maintenance and reliability improvements.
 
-The repository's [LICENSE](LICENSE) is **Apache License 2.0** (the upstream README incorrectly called it MIT). Original icon assets and attribution are preserved.
+The upstream [LICENSE](LICENSE) is **Apache License 2.0** (the upstream README incorrectly called it MIT); the original source, original icons and author attributions remain under their respective original grants.
+
+**Open-source distribution direction:** New contributions owned by fork contributors are intended for **GPL-3.0-only**, to support the GPL version of PyQt5. The complete [GPLv3 text](LICENSES/GPL-3.0-only.txt) and [imageio-ffmpeg BSD-2-Clause notice](LICENSES/BSD-2-Clause-imageio-ffmpeg.txt) are included. This does **not** unilaterally relicense the upstream Apache-covered code or other people's contributions. Read the [distribution policy](docs/OPEN_SOURCE_DISTRIBUTION_POLICY.md) for ownership boundaries and prerequisites.
+
+**This is not a released GPLv3 installer yet.** The exact Qt and FFmpeg binaries, their licenses/source requirements, and the installer's licensing notices must be audited before distributing a public EXE. GitHub Actions is unavailable due to a reported account billing restriction; local QA evidence is required instead of claiming passing hosted CI.

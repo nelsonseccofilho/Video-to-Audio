@@ -1,12 +1,13 @@
 # Local Python environments and caches
 venv/
 .venv/
+.venv-build/
 __pycache__/
 *.py[cod]
 .pytest_cache/
 
 # Packaging and editor artifacts
-build/
+build/pyinstaller/
 dist/
 *.egg-info/
 .vscode/
