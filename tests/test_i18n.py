@@ -13,15 +13,13 @@ class LocalizationTests(unittest.TestCase):
         self.assertEqual(set(EN), set(PT_BR))
         self.assertTrue(all(text.strip() for text in EN.values()))
         self.assertTrue(all(text.strip() for text in PT_BR.values()))
-        self.assertEqual(set(SUPPORTED_CHOICES), {"auto", "en", "pt_BR"})
+        self.assertEqual(tuple(SUPPORTED_CHOICES), ("en", "pt_BR"))
 
-    def test_detects_portuguese_variants_and_falls_back_to_english(self):
-        self.assertEqual(effective_language("auto", "pt_BR"), "pt_BR")
-        self.assertEqual(effective_language("auto", "pt_PT"), "pt_BR")
-        self.assertEqual(effective_language("auto", "en_US"), "en")
-        self.assertEqual(effective_language("auto", "es_ES"), "en")
+    def test_explicit_choices_and_legacy_auto_default_to_english(self):
+        self.assertEqual(effective_language("auto", "pt_BR"), "en")
         self.assertEqual(effective_language("en", "pt_BR"), "en")
         self.assertEqual(effective_language("pt_BR", "en_US"), "pt_BR")
+        self.assertEqual(effective_language("invalid"), "en")
 
     def test_format_tokens_match_across_languages(self):
         import string
