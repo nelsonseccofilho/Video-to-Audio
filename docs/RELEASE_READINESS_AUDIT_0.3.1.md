@@ -93,3 +93,11 @@ The project owner requested a **free and open-source** distribution and explicit
 **Remaining hard blockers for public EXE:** obtain the generated local audit report and independently inspect FFmpeg configure flags/source license, Qt/PyQt library notices and compliance, appropriate corresponding source delivery, contributor/license headers and UI licensing notices. Existing setup license page still represents Apache-2.0 and needs adjustment to describe the combined GPLv3 distribution accurately. The unofficial Portuguese translation remains subject to independent review.
 
 **Decision:** GPLv3 strategy approved in principle; **public binary distribution NOT approved**. Keep both PRs open until final compliance, provenance and technical review. Local QA is a documented alternative while hosted runners are unavailable; it does not turn failed GitHub Actions checks green.
+
+## Update — actual FFmpeg evidence inspected (2026-10-10)
+
+The user provided the requested archive of six locally generated audit records. Full technical details and source/legal links are in [FFmpeg binary audit](FFMPEG_BINARY_AUDIT_0.3.1.md).
+
+**New verified evidence:** the 0.3.1 installer at revision `62af9dd64` was SHA256 `805c4a82368254edfb2f276df585437268ee75f6c6207bf9b0c35c6a8e80eed7`; bundled FFmpeg is `ffmpeg-win-x86_64-v7.1.exe`, Gyan.dev 7.1 Essentials, SHA256 `2ce797a0f88d7f067180338fb227f7b1928ea727bd9a4d7a1d022f7c52af71a3`. The binary itself declares **GPL version 3 or later**; `--enable-gpl`, `--enable-version3`, `--enable-static`, `--enable-libx264`, `--enable-libx265` are present and `--enable-nonfree` was **not observed**. The exact build dependency versions, including PyQt5 5.15.11 and Qt wheel 5.15.2, have been recorded.
+
+**Gate partially advanced:** no longer need to guess the FFmpeg licensing *family*; now must locate/provide **exact corresponding source and external library source** for this 7.1 static build, verify its provenance and obligations, and inventory all Qt/PyQt DLLs and plugins. The public EXE remains **HOLD**. Absence of `--enable-nonfree` is favorable but not conclusive proof of lawful redistribution. The current setup license screen still describes Apache 2.0 rather than the combined GPLv3 distribution.
