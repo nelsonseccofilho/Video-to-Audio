@@ -176,7 +176,7 @@ class GuiTests(unittest.TestCase):
             self.assertEqual(window.clear_btn.text(), "Limpar lista")
             self.assertIn("Salvar áudio em:", window.output_label.text())
             self.assertEqual(window.language_label.text(), "Idioma:")
-            self.assertIn("Não", window._localized_error(
+            self.assertIn("Nenhuma faixa de áudio", window._localized_error(
                 "gravacao.mkv: No audio stream found: gravacao.mkv"
             ))
             with mock.patch.object(APP["QMessageBox"], "information") as info:
