@@ -74,7 +74,7 @@ You can now search for **Video-to-Audio** from Start and pin it. If you have alr
 
 After all files convert successfully, select **OK** on the completion dialog: the input list and any manually selected output folder are cleared for the next batch. The progress bar and completion message stay visible as confirmation. If a batch fails or is cancelled, the list remains available to retry.
 
-The **Language / Idioma** selector lists two options alphabetically: English (the default) and Português (Brasil). Changing the selection retranslates the application immediately, including its buttons, status, paths, messages and tooltips, and saves the preference. The Windows installer separately supports English by default and Brazilian Portuguese. Its Brazilian Portuguese license screen includes a summary followed by the authoritative original English Apache-2.0 license; this is an informational aid, not an official legal translation.
+The **Language / Idioma** selector lists two options alphabetically: English (the default) and Português (Brasil). Changing the selection retranslates the application immediately, including its buttons, status, paths, messages and tooltips, and saves the preference. The Windows installer separately supports English by default and Brazilian Portuguese. The Portuguese legal screen includes an **informational translation** of Apache-2.0 and its authoritative English text. **The installer legal screen still needs revision before GPLv3 binary redistribution; it does not yet explain every included license.**
 
 WAV uses uncompressed 16-bit PCM and ignores the bitrate option. A raw AAC output is an ADTS audio file. An input without an audio stream is reported as a failed file, and remaining files continue processing. If a media file does not report its duration, per-file progress may stay at its starting value until conversion completes.
 
@@ -117,4 +117,8 @@ Tests include FFmpeg extraction to all three formats, filename conflicts, audio-
 
 Originally created by **Nasir Shahbaz** for [NSTechBytes](https://github.com/NSTechBytes). This repository includes additional maintenance and reliability improvements.
 
-The repository's [LICENSE](LICENSE) is **Apache License 2.0** (the upstream README incorrectly called it MIT). Original icon assets and attribution are preserved.
+The upstream [LICENSE](LICENSE) is **Apache License 2.0** (the upstream README incorrectly called it MIT); the original source, original icons and author attributions remain under their respective original grants.
+
+**Open-source distribution direction:** New contributions owned by fork contributors are intended for **GPL-3.0-only**, to support the GPL version of PyQt5. The complete [GPLv3 text](LICENSES/GPL-3.0-only.txt) and [imageio-ffmpeg BSD-2-Clause notice](LICENSES/BSD-2-Clause-imageio-ffmpeg.txt) are included. This does **not** unilaterally relicense the upstream Apache-covered code or other people's contributions. Read the [distribution policy](docs/OPEN_SOURCE_DISTRIBUTION_POLICY.md) for ownership boundaries and prerequisites.
+
+**This is not a released GPLv3 installer yet.** The exact Qt and FFmpeg binaries, their licenses/source requirements, and the installer's licensing notices must be audited before distributing a public EXE. GitHub Actions is unavailable due to a reported account billing restriction; local QA evidence is required instead of claiming passing hosted CI.
