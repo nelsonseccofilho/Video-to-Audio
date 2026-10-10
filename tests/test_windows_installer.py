@@ -58,3 +58,14 @@ class PackagingTests(unittest.TestCase):
             self.assertEqual(
                 windows_build.find_iscc(str(compiler)), compiler.resolve()
             )
+
+    def test_bilingual_setup_languages_and_shortcuts(self):
+        script = (ROOT / "installer" / "Video-to-Audio.iss").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn('Name: "en"; MessagesFile: "compiler:Default.isl"', script)
+        self.assertIn("BrazilianPortuguese.isl", script)
+        self.assertIn("ptbr.DesktopShortcut=", script)
+        self.assertIn("ptbr.LaunchApp=", script)
+        self.assertIn('Description: "{cm:DesktopShortcut}"', script)
+        self.assertIn('Description: "{cm:LaunchApp}"', script)
