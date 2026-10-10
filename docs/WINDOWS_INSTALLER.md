@@ -64,7 +64,7 @@ The application UI and setup wizard are independently selectable. Choosing Portu
 
 First validate the existing app GUI on PR #1, then on a Windows test system:
 
-- [ ] Build passes tests and creates both files above (34 tests expected with English-first bilingual language switching, per-language license notice and syntax preflight).
+- [ ] Build passes tests and creates both files above (35 tests expected with English-first bilingual language switching, per-language license notice and syntax preflight).
 - [ ] The standalone EXE starts by double-click, without a terminal window.
 - [ ] Convert one MKV to MP3 without picking a folder and play the audio.
 - [ ] After confirming a fully successful conversion, the input list is cleared and the final completion status remains visible.
