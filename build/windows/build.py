@@ -67,6 +67,16 @@ def ensure_build_environment() -> Path:
     return python
 
 
+def check_source_syntax(python: Path) -> None:
+    """Fail fast on Python syntax errors before installing dependencies or packaging."""
+    run(
+        python, "-m", "compileall", "-q",
+        PROJECT / "Video to Audio.py", PROJECT / "converter.py",
+        PROJECT / "i18n.py", PROJECT / "tests",
+        PROJECT / "build" / "windows" / "build.py",
+    )
+
+
 def run_tests(python: Path) -> None:
     env = os.environ.copy()
     env["QT_QPA_PLATFORM"] = "offscreen"
@@ -150,6 +160,7 @@ def main() -> int:
             "Use --app-only to package the application without an installer."
         )
 
+    check_source_syntax(Path(sys.executable))
     python = ensure_build_environment()
     run_tests(python)
     build_app(python)
