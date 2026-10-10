@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 from threading import Event, Lock
 
-from PyQt5.QtCore import Qt, QThread, pyqtSignal
+from PyQt5.QtCore import Qt, QSettings, QThread, pyqtSignal
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (
     QApplication, QComboBox, QFileDialog, QHBoxLayout, QLabel, QListWidget,
@@ -20,6 +20,7 @@ from converter import (
     VIDEO_EXTENSIONS, ConversionCancelled, ConversionError,
     available_output_path, convert_video, destination_folder,
 )
+from i18n import SUPPORTED_CHOICES, effective_language, translate, translate_failure
 
 ROOT = Path(__file__).resolve().parent
 
@@ -104,18 +105,42 @@ class VideoToAudioApp(QMainWindow):
         super().__init__()
         self.setWindowTitle("Video to Audio Converter")
         self.setWindowIcon(icon("Video to Audio.png"))
-        self.resize(650, 530)
+        self.resize(650, 560)
+        self.settings = QSettings("Video-to-Audio", "Video-to-Audio")
+        self.language_choice = str(self.settings.value("ui/language", "auto"))
+        if self.language_choice not in SUPPORTED_CHOICES:
+            self.language_choice = "auto"
+        self.language = effective_language(self.language_choice)
+        self._status_key = "ready"
+        self._status_values = {}
         self.video_paths: list[Path] = []
         self.output_dir: Path | None = None
         self.worker: ConvertThread | None = None
         self._close_when_finished = False
         self._build_ui()
+        self._apply_language()
 
     def _build_ui(self):
         content = QWidget(self)
         layout = QVBoxLayout(content)
 
-        layout.addWidget(QLabel("Videos to convert"))
+        locale_row = QHBoxLayout()
+        locale_row.addStretch()
+        self.language_label = QLabel(self)
+        locale_row.addWidget(self.language_label)
+        self.language_combo = QComboBox(self)
+        self.language_combo.addItem("", "auto")
+        self.language_combo.addItem("", "pt_BR")
+        self.language_combo.addItem("", "en")
+        self.language_combo.setCurrentIndex(
+            self.language_combo.findData(self.language_choice)
+        )
+        self.language_combo.currentIndexChanged.connect(self._on_language_changed)
+        locale_row.addWidget(self.language_combo)
+        layout.addLayout(locale_row)
+
+        self.videos_label = QLabel(self)
+        layout.addWidget(self.videos_label)
         self.video_list = QListWidget(self)
         self.video_list.setSelectionMode(QListWidget.ExtendedSelection)
         layout.addWidget(self.video_list)
@@ -135,12 +160,14 @@ class VideoToAudioApp(QMainWindow):
         layout.addLayout(file_controls)
 
         settings = QHBoxLayout()
-        settings.addWidget(QLabel("Output Format:"))
+        self.format_label = QLabel(self)
+        settings.addWidget(self.format_label)
         self.format_combo = QComboBox(self)
         self.format_combo.addItems(["mp3", "wav", "aac"])
         self.format_combo.currentTextChanged.connect(self._update_bitrate)
         settings.addWidget(self.format_combo)
-        settings.addWidget(QLabel("Bitrate:"))
+        self.bitrate_label = QLabel(self)
+        settings.addWidget(self.bitrate_label)
         self.bitrate_combo = QComboBox(self)
         self.bitrate_combo.addItems(["64", "128", "192", "256", "320"])
         self.bitrate_combo.setCurrentText("128")
@@ -164,10 +191,7 @@ class VideoToAudioApp(QMainWindow):
         self.output_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
         layout.addWidget(self.output_label)
 
-        self.output_hint = QLabel(
-            "Videos are in different folders. To keep all audio together, "
-            "you can choose one output folder. This is optional.", self
-        )
+        self.output_hint = QLabel(self)
         self.output_hint.setWordWrap(True)
         layout.addWidget(self.output_hint)
         self._update_output_location()
@@ -176,7 +200,7 @@ class VideoToAudioApp(QMainWindow):
         self.progress_bar.setRange(0, 100)
         self.progress_bar.setValue(0)
         layout.addWidget(self.progress_bar)
-        self.progress_label = QLabel("Ready to convert", self)
+        self.progress_label = QLabel(self)
         self.progress_label.setWordWrap(True)
         layout.addWidget(self.progress_label)
 
@@ -193,11 +217,66 @@ class VideoToAudioApp(QMainWindow):
 
         self.setCentralWidget(content)
 
+    def _t(self, key: str, **values) -> str:
+        return translate(self.language, key, **values)
+
+    def _set_status(self, key: str, **values):
+        self._status_key = key
+        self._status_values = values
+        self.progress_label.setText(self._t(key, **values))
+
+    def _on_language_changed(self, _index):
+        self.language_choice = str(self.language_combo.currentData())
+        self.settings.setValue("ui/language", self.language_choice)
+        self._apply_language()
+
+    def set_language(self, choice: str, *, persist: bool = False):
+        """Change locale without persisting in tests, or save a user selection."""
+        if choice not in SUPPORTED_CHOICES:
+            raise ValueError(f"Unsupported language choice: {choice}")
+        self.language_choice = choice
+        if persist:
+            self.settings.setValue("ui/language", choice)
+        index = self.language_combo.findData(choice)
+        was_blocked = self.language_combo.blockSignals(True)
+        self.language_combo.setCurrentIndex(index)
+        self.language_combo.blockSignals(was_blocked)
+        self._apply_language()
+
+    def _apply_language(self):
+        self.language = effective_language(self.language_choice)
+        self.setWindowTitle(self._t("window_title"))
+        self.language_label.setText(self._t("language_label"))
+        for choice, key in (
+            ("auto", "language_auto"),
+            ("pt_BR", "language_pt"),
+            ("en", "language_en"),
+        ):
+            self.language_combo.setItemText(
+                self.language_combo.findData(choice), self._t(key)
+            )
+        self.videos_label.setText(self._t("videos_label"))
+        self.select_btn.setText(self._t("select_videos"))
+        self.remove_btn.setText(self._t("remove_selected"))
+        self.clear_btn.setText(self._t("clear_list"))
+        self.format_label.setText(self._t("output_format"))
+        self.bitrate_label.setText(self._t("bitrate"))
+        self.output_btn.setText(self._t("choose_folder"))
+        self.original_btn.setText(self._t("source_folders"))
+        self.output_hint.setText(self._t("mixed_folders_hint"))
+        self.convert_btn.setText(self._t("convert"))
+        self.cancel_btn.setText(self._t("cancel"))
+        self._update_bitrate()
+        self._update_output_location()
+        self.progress_label.setText(
+            self._t(self._status_key, **self._status_values)
+        )
+
     def _update_bitrate(self, _value=None):
         enabled = self.format_combo.currentText() != "wav"
         self.bitrate_combo.setEnabled(enabled)
         self.bitrate_combo.setToolTip(
-            "" if enabled else "WAV uses uncompressed PCM audio; bitrate does not apply."
+            "" if enabled else self._t("wav_tooltip")
         )
 
     def add_files(self, files):
@@ -215,8 +294,7 @@ class VideoToAudioApp(QMainWindow):
 
     def open_file_dialog(self):
         files, _ = QFileDialog.getOpenFileNames(
-            self, "Select Video Files", "",
-            "Video Files (*.mp4 *.avi *.mov *.mkv *.webm *.m4v)",
+            self, self._t("video_dialog"), "", self._t("video_filter"),
         )
         self.add_files(files)
 
@@ -239,7 +317,7 @@ class VideoToAudioApp(QMainWindow):
             self.video_paths[0].parent if self.video_paths else Path.home()
         )
         directory = QFileDialog.getExistingDirectory(
-            self, "Choose a common audio output folder (optional)", str(initial)
+            self, self._t("folder_dialog"), str(initial)
         )
         if directory:
             self.output_dir = Path(directory)
