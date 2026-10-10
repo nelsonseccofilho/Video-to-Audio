@@ -73,6 +73,7 @@ def probe_media(source: Path, ffmpeg: str) -> float | None:
             errors="replace",
             timeout=30,
             check=False,
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
         )
     except (OSError, subprocess.TimeoutExpired) as exc:
         raise ConversionError(f"Cannot inspect video: {exc}") from exc
@@ -140,6 +141,7 @@ def convert_video(
             process = subprocess.Popen(
                 command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                 text=True, encoding="utf-8", errors="replace", bufsize=1,
+                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
             )
         except OSError as exc:
             raise ConversionError(f"Cannot start FFmpeg: {exc}") from exc
@@ -183,19 +185,29 @@ def convert_video(
         except FileExistsError as exc:
             raise ConversionError(f"Output file already exists: {destination.name}") from exc
         except OSError:
+            destination_created = False
             try:
                 with temporary.open("rb") as reader, destination.open("xb") as writer:
+                    destination_created = True
                     shutil.copyfileobj(reader, writer)
+            except FileExistsError as exc:
+                raise ConversionError(
+                    f"Output file already exists: {destination.name}"
+                ) from exc
             except Exception:
-                destination.unlink(missing_ok=True)
+                if destination_created:
+                    destination.unlink(missing_ok=True)
                 raise
 
         if on_progress:
             on_progress(100)
     finally:
-        if process is not None and process.poll() is None:
-            process.kill()
-            process.wait()
+        if process is not None:
+            if process.poll() is None:
+                process.kill()
+                process.wait()
+            if process.stdout is not None:
+                process.stdout.close()
         if on_process:
             on_process(None)
         temporary.unlink(missing_ok=True)
