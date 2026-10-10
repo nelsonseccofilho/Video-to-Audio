@@ -13,7 +13,7 @@ A desktop video-to-audio converter for Windows, based on [NSTechBytes/Video-to-A
 - Keep the interface responsive with a background worker.
 - Launch from the Windows Start menu using pythonw.exe without opening a terminal.
 - Use a private Python virtual environment; no changes to system Python or WhisperX.
-- Choose English or **Português (Brasil)**, or follow the Windows language automatically. The language preference is saved.
+- Choose **English** (default) or **Português (Brasil)**; switching updates the interface immediately and saves the preference.
 - Clear the input list automatically after a fully successful conversion; keep it on errors or cancellation.
 
 ## Windows / PowerShell installation
@@ -74,7 +74,7 @@ You can now search for **Video-to-Audio** from Start and pin it. If you have alr
 
 After all files convert successfully, select **OK** on the completion dialog: the input list and any manually selected output folder are cleared for the next batch. The progress bar and completion message stay visible as confirmation. If a batch fails or is cancelled, the list remains available to retry.
 
-The **Language / Idioma** selector at the top-right has three options: Automatic (Windows), Português (Brasil) and English. Automatic follows the Windows UI locale (Portuguese locales use pt-BR; other languages use English). A manually chosen language persists for future launches. The Windows installer also offers English and Brazilian Portuguese; the Apache-2.0 license remains in its official English text.
+The **Language / Idioma** selector lists two options alphabetically: English (the default) and Português (Brasil). Changing the selection retranslates the application immediately, including its buttons, status, paths, messages and tooltips, and saves the preference. The Windows installer separately supports English by default and Brazilian Portuguese. Its Brazilian Portuguese license screen includes a summary followed by the authoritative original English Apache-2.0 license; this is an informational aid, not an official legal translation.
 
 WAV uses uncompressed 16-bit PCM and ignores the bitrate option. A raw AAC output is an ADTS audio file. An input without an audio stream is reported as a failed file, and remaining files continue processing. If a media file does not report its duration, per-file progress may stay at its starting value until conversion completes.
 
@@ -94,7 +94,7 @@ The output-folder experience follows the Nielsen Norman Group's principles of sy
 
 ## Windows installer — preview
 
-The experimental installer is developed separately on branch **feat/windows-installer**.
+The preview installer is developed separately on branch **feat/windows-installer**. The English-first bilingual build is **0.3.0** (not an official public release).
 See the [installer build guide](docs/WINDOWS_INSTALLER.md) for a locally built executable and Setup.exe.
 
 When the branch is checked out, you can run the build on Windows with Python 3.12 and Inno Setup 6:
