@@ -60,8 +60,14 @@ if ($LASTEXITCODE -ne 0) { throw 'Could not obtain exact build Python dependenci
 
 # A local test run is independent of GitHub Actions.
 $env:QT_QPA_PLATFORM = 'offscreen'
-& $python -m unittest discover -s tests -v 2>&1 | Out-File -LiteralPath (Join-Path $destination 'test-results.txt') -Encoding UTF8
-if ($LASTEXITCODE -ne 0) { throw 'Local tests failed. Audit is not complete.' }
+# Use separate native stdout/stderr logs. Qt font warnings may be emitted to
+# stderr even when tests pass; do not treat those warnings as PowerShell errors.
+$testStdout = Join-Path $destination 'test-stdout.txt'
+$testStderr = Join-Path $destination 'test-stderr.txt'
+$testProcess = Start-Process -FilePath $python -ArgumentList @(
+    '-m', 'unittest', 'discover', '-s', 'tests', '-v'
+) -WorkingDirectory $root -NoNewWindow -Wait -PassThru -RedirectStandardOutput $testStdout -RedirectStandardError $testStderr
+if ($testProcess.ExitCode -ne 0) { throw 'Local tests failed. Check test-stderr.txt and test-stdout.txt.' }
 
 $revision = (& git -C $root rev-parse HEAD).Trim()
 if ($LASTEXITCODE -ne 0) { throw 'Could not identify the audited Git revision.' }
