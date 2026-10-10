@@ -1,0 +1,18 @@
+# Local Python environments and caches
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Packaging and editor artifacts
+build/
+dist/
+*.egg-info/
+.vscode/
+.idea/
+
+# Extracted audio (do not commit user media)
+*.mp3
+*.wav
+*.aac
