@@ -44,10 +44,12 @@ EN = {
     "starting": "Starting conversion...",
     "progress": "{name}: {current}% (batch: {overall}%)",
     "cancelling": "Cancelling conversion...",
-    "cancelled": "Cancelled. {completed} file(s) completed.",
+    "cancelled_one": "Cancelled. {completed} file completed.",
+    "cancelled_many": "Cancelled. {completed} files completed.",
     "partial": "Finished: {completed} succeeded, {failed} failed.",
     "more_errors": "...and {count} more.",
-    "complete": "Complete: {completed} file(s) converted.",
+    "complete_one": "Complete: {completed} file converted.",
+    "complete_many": "Complete: {completed} files converted.",
     "missing_selection_title": "Missing selection",
     "missing_selection": "Select at least one video.",
     "missing_folder_title": "Missing folder",
@@ -103,10 +105,12 @@ PT_BR = {
     "starting": "Iniciando conversão...",
     "progress": "{name}: {current}% (lote: {overall}%)",
     "cancelling": "Cancelando conversão...",
-    "cancelled": "Cancelado. {completed} arquivo(s) concluído(s).",
-    "partial": "Concluído: {completed} sucesso(s) e {failed} falha(s).",
-    "more_errors": "... e mais {count} erro(s).",
-    "complete": "Concluído: {completed} arquivo(s) convertido(s).",
+    "cancelled_one": "Cancelado. {completed} arquivo concluído.",
+    "cancelled_many": "Cancelado. {completed} arquivos concluídos.",
+    "partial": "Conversão finalizada. Sucessos: {completed}. Falhas: {failed}."
+    "more_errors": "... e mais {count} outras ocorrências."
+    "complete_one": "Concluído: {completed} arquivo convertido.",
+    "complete_many": "Concluído: {completed} arquivos convertidos.",
     "missing_selection_title": "Nenhum vídeo selecionado",
     "missing_selection": "Selecione pelo menos um vídeo.",
     "missing_folder_title": "Pasta não encontrada",
@@ -147,6 +151,8 @@ def effective_language(choice: str, system_locale: str | None = None) -> str:
 
 
 def translate(lang: str, key: str, **values: object) -> str:
+    if key in ("complete", "cancelled"):
+        key = key + ("_one" if values.get("completed") == 1 else "_many")
     catalog = CATALOGS.get(lang, EN)
     template = catalog.get(key, EN.get(key, key))
     return template.format(**values)
