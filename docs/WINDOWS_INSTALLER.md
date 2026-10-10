@@ -1,4 +1,4 @@
-# Windows installer — candidate build 0.2.0
+# Windows installer — candidate build 0.3.0
 
 This is a **local preview build**, not a validated or published release.
 
@@ -28,12 +28,12 @@ The script:
 5. Checks that application executable, FFmpeg binary and icons exist.
 6. Calls Inno Setup and reports the installer's SHA256.
 
-This preview uses version 0.2.0 to distinguish the new pt-BR build from the earlier 0.1.0 test installation. The installer should upgrade an existing 0.1.0 install rather than creating a second application entry.
+This preview uses version 0.3.0 to distinguish the bilingual UX refinements from the tested 0.1.0 and 0.2.0 preview installers. The installer should upgrade an existing installation without creating a separate product entry (AppId is unchanged).
 
 Generated files:
 
 - Standalone app: dist\Video-to-Audio\Video-to-Audio.exe
-- Local preview installer: dist\installer\Video-to-Audio-Setup-0.2.0.exe
+- Local preview installer: dist\installer\Video-to-Audio-Setup-0.3.0.exe
 
 If Inno Setup is not installed yet, create only the standalone GUI:
 
@@ -51,6 +51,9 @@ Do not commit dist, the generated build/pyinstaller directory, .venv-build or co
 
 ## Installer behavior
 
+The application UI and setup wizard are independently selectable. Choosing Portuguese for the setup wizard does not implicitly override the application default (English); the user can switch languages within the installed GUI and the selection persists. The operating system's native file picker may retain the Windows language by design. The Apache 2.0 source document stays in English, while the Portuguese license screen includes an informative preface. See https://www.apache.org/foundation/license-faq.html for the ASF's guidance on translations.
+
+
 - Per-user installation in %LOCALAPPDATA%\Programs\Video-to-Audio without administrator privileges.
 - Start menu shortcut and an optional desktop shortcut (off by default).
 - Windows uninstaller and optional launch at the end.
@@ -61,14 +64,14 @@ Do not commit dist, the generated build/pyinstaller directory, .venv-build or co
 
 First validate the existing app GUI on PR #1, then on a Windows test system:
 
-- [ ] Build passes tests and creates both files above (31 tests expected with pt-BR localization, post-conversion reset and syntax preflight).
+- [ ] Build passes tests and creates both files above (34 tests expected with English-first bilingual language switching, per-language license notice and syntax preflight).
 - [ ] The standalone EXE starts by double-click, without a terminal window.
 - [ ] Convert one MKV to MP3 without picking a folder and play the audio.
 - [ ] After confirming a fully successful conversion, the input list is cleared and the final completion status remains visible.
 - [ ] After a failed/cancelled conversion, the input list is retained so the user can retry.
-- [ ] On Brazilian Portuguese Windows, the app defaults to Português (Brasil); language selector also supports English and Automatic (Windows).
-- [ ] Changing language updates labels, progress, warnings and output location; the manual language choice is kept on a new launch.
-- [ ] Installer wizard is available in English and Português Brasileiro; shortcuts, launch option and uninstall work in the chosen installer language.
+- [ ] The application starts in English on Windows regardless of OS locale. The language dropdown lists English first and Português (Brasil) second.
+- [ ] Switching English → Português (Brasil) → English immediately updates labels, progress, warnings, dialogs, and destination tooltips; the manually selected language is saved for subsequent launches.
+- [ ] Installer offers English first (default even on a pt-BR Windows machine) and Português Brasileiro second. Each choice translates wizard controls and displays its matching license screen. The Portuguese screen begins with a nonbinding explanation and then includes the full authoritative English Apache 2.0 text.
 - [ ] Mixed-source batch saves beside each original and displays correct paths.
 - [ ] Shared folder and Use source folders actions work.
 - [ ] Cancel conversion and test duplicate filenames on test media.
@@ -76,7 +79,7 @@ First validate the existing app GUI on PR #1, then on a Windows test system:
 - [ ] Run the installed app without a Python install on PATH (ideally clean Windows VM).
 - [ ] Convert a short video using the installed app and listen to MP3.
 - [ ] Uninstall and confirm application files disappear but source videos/output audio remain.
-- [ ] Upgrade the previously installed 0.1.0 preview to 0.2.0 without duplicate product entries (AppId unchanged).
+- [ ] Upgrade the installed 0.2.0 preview to 0.3.0 without duplicate product entries (AppId unchanged).
 - [ ] Resolve third-party binary redistribution requirements (THIRD_PARTY_NOTICES.md).
 - [ ] Review Windows SmartScreen: the preview installer is not code-signed.
 
