@@ -102,6 +102,18 @@ class PackagingTests(unittest.TestCase):
         localized = (ROOT / "installer" / "LICENSE.pt-BR.txt").read_text(
             encoding="utf-8"
         )
-        self.assertIn("RESUMO INFORMATIVO", localized)
-        self.assertIn("não substitui o texto", localized)
+        self.assertIn("TRADUÇÃO INFORMATIVA", localized)
+        self.assertIn("NÃO é uma versão oficial", localized)
+        self.assertIn("LICENÇA APACHE", localized)
+        self.assertIn("TERMOS E CONDIÇÕES DE USO", localized)
+        for heading in (
+            "1. Definições.", "2. Concessão de licença de direitos autorais.",
+            "3. Concessão de licença de patentes.", "4. Redistribuição.",
+            "5. Submissão de Contribuições.", "6. Marcas.",
+            "7. Isenção de garantias.", "8. Limitação de responsabilidade.",
+            "9. Aceitação de garantias ou responsabilidades adicionais.",
+        ):
+            self.assertIn(heading, localized)
+        self.assertIn("APÊNDICE: Como aplicar a Licença Apache", localized)
+        self.assertIn("ÚNICA VERSÃO JURIDICAMENTE VINCULANTE", localized)
         self.assertTrue(localized.rstrip().endswith(original))
