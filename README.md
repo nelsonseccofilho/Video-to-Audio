@@ -94,7 +94,7 @@ The output-folder experience follows the Nielsen Norman Group's principles of sy
 
 ## Windows installer — preview
 
-The preview installer is developed separately on branch **feat/windows-installer**. The English-first bilingual build is **0.3.0** (not an official public release).
+The preview installer is developed separately on branch **feat/windows-installer**. The English-first bilingual build with a complete pt-BR informational license translation is **0.3.1** (not an official public release).
 See the [installer build guide](docs/WINDOWS_INSTALLER.md) for a locally built executable and Setup.exe.
 
 When the branch is checked out, you can run the build on Windows with Python 3.12 and Inno Setup 6:
